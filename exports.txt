@@ -1,0 +1,9 @@
+export FLASK_APP=application.py
+export FLASK_DEBUG=1
+export admin1_user=bassam
+export admin2_user=ahmed
+export admin3_user=tarek
+export admin1_pass=bassam
+export admin2_pass=ahmed
+export admin3_pass=tarek
+export sqlpass=sqldata
