@@ -102,3 +102,28 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 
+@app.route("/")
+def index():
+    if session.get("admin") is None and session.get("token") is None:
+        return render_template("control/index.html")
+    elif session.get("admin"):
+        check_admin_cookies()
+        return render_template("control/main.html")
+    elif session.get("token_tech"):
+        check_cookies()
+        return render_template("control/main.html")
+    elif session.get("token_man"):
+        check_cookies()
+        return render_template("control/main.html")
+
+
+def errorhandler(e):
+    """Handle error"""
+    if not isinstance(e, HTTPException):
+        e = InternalServerError()
+    return render_template("control/error.html",name=e.name, code=e.code)
+
+
+# Listen for errors
+for code in default_exceptions:
+    app.errorhandler(code)(errorhandler)

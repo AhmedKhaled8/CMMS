@@ -5,7 +5,17 @@
 {% endblock %}
 
 {% block main %}
+	{% if session['log_tech'] is defined %}
     <form action="/login" method="post">
+	{% elif session['log_man'] is defined %}
+	<form action="/login" method="post">
+	{% elif session['log_hr'] is defined %}
+	<form action="/login" method="post">
+	{% else %}
+	<script>
+		window.location.replace='index.html'
+	</script>
+	{% endif%}
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
         </div>
