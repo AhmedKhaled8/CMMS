@@ -32,6 +32,17 @@ tables['manager_extras'] = ("CREATE TABLE manager_extras ("
     " FOREIGN KEY (m_code) REFERENCES manager_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
+tables['users_man'] = ("CREATE TABLE users_man ("
+	" code smallint UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+    " username varchar(51) UNIQUE NOT NULL,"
+    " hash char(74) NOT NULL,"
+    " token char(32) NOT NULL,"
+    " email varchar(70) NOT NULL,"
+    " m_code smallint UNSIGNED NOT NULL,"
+    " FOREIGN KEY (m_code) REFERENCES manager_essentials(code)"
+	" ON UPDATE CASCADE ON DELETE CASCADE);")
+
+
 tables['tech_essentials'] = ("CREATE TABLE tech_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
@@ -47,6 +58,16 @@ tables['tech_extras'] = ("CREATE TABLE tech_extras ("
     "" + province_block + ","
     " FOREIGN KEY (t_code) REFERENCES tech_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
+
+tables['users_tech'] = ("CREATE TABLE users_tech ("
+	" code smallint UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
+    " username varchar(51) UNIQUE NOT NULL,"
+    " hash char(74) NOT NULL,"
+    " token char(32) NOT NULL,"
+    " email varchar(70) NOT NULL,"
+    " t_code smallint UNSIGNED NOT NULL,"
+    " FOREIGN KEY (t_code) REFERENCES tech_essentials(code)"
+	" ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['device_essentials'] = ("CREATE TABLE device_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
