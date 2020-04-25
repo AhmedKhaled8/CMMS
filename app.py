@@ -18,6 +18,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.sql import func
 from sqlalchemy.exc import SQLAlchemyError
 
 from helpers import login_required,admin_required, apology, check_admins, check_admin_cookies
@@ -72,7 +73,7 @@ def check_cookies(user_type = "man"):
             return render_template("control/banned.html")
         return True
     if user_type == "tech" or user_type == "technician":
-        sel_command = users_tech.select().where(users_tech.c.username == session.get("username")).where(users_tech.c.token == session.get("token"))
+        sel_command = users_tech.select().where(users_tech.c.username == session.get("username")).where(users_tech.c.token == session.get("token")).limit(1)
         sel_command = db.execute(sel_command)
         cookie = sel_command.fetchone()
         if cookie is None:
@@ -261,6 +262,102 @@ def login_tech():
         # Redirect user to home page
         return redirect("/")
 
+
+def register(user_table, essentials_table, extras_table, reference_name):
+    """Register user"""
+    user = request.form.get("username")
+    # Ensure username was submitted
+    if not user:
+        return apology("must provide username", 400)
+
+    # Ensure password was submitted
+    elif not request.form.get("password"):
+        return apology("must provide password", 400)
+
+    # Ensure confirmation was submitted
+    elif not request.form.get("confirmation"):
+        return apology("must provide confirmation", 400)
+
+    # Check whether the password and confirmation match
+    elif request.form.get("password") != request.form.get("confirmation"):
+        return apology("password and confirmation do not match", 400)
+
+    sel_command = user_table.select().with_only_columns([user_table.c.username]).where(user_table.c.username == session.get("username")).limit(1)
+    sel_command = db.execute(sel_command)
+    rows = sel_command.fetchone()
+    
+    if rows:
+        return apology("Username already exists", 400)
+
+    hasher = generate_password_hash(request.form.get("password"))
+    # Strip hash from extra characters
+    # Extra characters are "pbkdf2:sha256:150000$"
+    hasher = hasher[21:]
+    
+    # Make a random number for token
+    token = binascii.hexlify(os.urandom(16))
+    token = token.decode("utf-8")
+    
+    
+    if not request.form.get("insurance") or request.form.get("insurance")== '':
+        print("\n No insurance Entered")
+        insurance = 0
+    else:
+        insurance = request.form.get("insurance")
+    # Insert essentials in table
+    insert1 = essentials_table.insert().values(name = request.form.get("name"), insurance = insurance)
+    db.execute(insert1)
+    # Get the unique code of the current user
+    sel_command = essentials_table.select().with_only_columns([func.max(essentials_table.c.code)]).where(essentials_table.c.name == request.form.get("name")).limit(1)
+    sel_command = db.execute(sel_command)
+    code = sel_command.fetchone()[0]
+    
+    dictionary = {reference_name : code}
+    
+    # Insert extras in table
+    insert2 = extras_table.insert().values(**dictionary, SSN = request.form.get("SSN"),
+    sex = request.form.get("sex"), phone = request.form.get("phone"), bdate = request.form.get("bdate"),
+    street = request.form.get("street"), province = request.form.get("province"))
+    
+    # Insert new user credentials
+    insert3 = user_table.insert().values(username = user, hash = hasher, token = token, email = request.form.get("email"), **dictionary)
+    
+    # commit changes in database
+    db.execute(insert2)
+    db.execute(insert3)
+    
+    return token, user
+    
+
+
+@app.route("/add_man", methods=["GET", "POST"])
+@admin_required
+def add_man():
+    if request.method == "GET":
+        return render_template("control/register.html", reg_type = "man")
+    
+    # User reached route via POST (as by submitting a form via POST)
+    elif request.method == "POST":
+        token, user = register(users_man, manager_essentials, manager_extras, "m_code")
+        # automatically login
+        session["token_man"] = token
+        session["username"] = user
+        return redirect("/")
+        
+@app.route("/add_tech", methods=["GET", "POST"])
+@admin_required
+def add_tech():
+    if request.method == "GET":
+        return render_template("control/register.html", reg_type = "tech")
+    
+    # User reached route via POST (as by submitting a form via POST)
+    elif request.method == "POST":
+        token, user = register(users_tech, tech_essentials, tech_extras, "t_code")
+        # automatically login
+        session["token_tech"] = token
+        session["username"] = user
+        return redirect("/")
+        
 
 @app.route("/logout")
 def logout():

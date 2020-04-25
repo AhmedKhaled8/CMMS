@@ -5,8 +5,15 @@
 {% endblock %}
 
 {% block main %}
-
-    <form action="/register" method="post" id="form">
+    {% if reg_type == "man" %}
+    <form action="/add_man" method="post" id="form">
+	{% elif reg_type == "tech" %}
+	<form action="/add_tech" method="post" id="form">
+	{% else %}
+	<script>
+		window.location='/'
+	</script>
+	{% endif%}
         <div class="form-group">
 			<label for="user_input">Username</label>
             <input autocomplete="off" autofocus class="form-control" id="user_input" name="username" placeholder="Username" type="text">
@@ -40,7 +47,7 @@
         </div>
         <div class="form-group">
 			<label for="bdate">Birth day</label>
-            <input autocomplete="off" class="form-control" min="1900-01-01" max="2010-01-01" id="bdate" name="bdate" type="date">
+            <input autocomplete="off" class="form-control" min="1970-01-01" max="2010-01-01" id="bdate" name="bdate" type="date">
         </div>
         <div class="form-group">
 			<label for="phone">Phone number</label>
@@ -49,20 +56,6 @@
         <div class="form-group">
 			<label for="insurance">Insurance number (If applicable)</label>
             <input autocomplete="off" class="form-control" id="insurance" name="insurance" placeholder="Insurance number (If applicable)" type="text">
-        </div>
-        <div class="form-group">
-			<label for="blood_type">Blood type</label>
-            <select id="blood_type" name="blood_type">
-				<option value="">Select blood type</option>
-				<option value="unknown">unknown</option>
-				<option value="A-">A-</option>
-				<option value="A+">A+</option>
-				<option value="B-">B-</option>
-				<option value="AB-">AB-</option>
-				<option value="AB+">AB+</option>
-				<option value="O-">O-</option>
-				<option value="O+">O+</option>
-			</select>
         </div>
         <div class="form-group">
 			<label for="address">Street address</label>
