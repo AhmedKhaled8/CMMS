@@ -104,17 +104,158 @@ Session(app)
 
 @app.route("/")
 def index():
-    if session.get("admin") is None and session.get("token") is None:
+    if session.get("admin") is None and session.get("token_tech") is None and session.get("token_man") is None:
         return render_template("control/index.html")
     elif session.get("admin"):
         check_admin_cookies()
         return render_template("control/main.html")
     elif session.get("token_tech"):
-        check_cookies()
+        check_cookies("tech")
         return render_template("control/main.html")
     elif session.get("token_man"):
-        check_cookies()
+        check_cookies("man")
         return render_template("control/main.html")
+
+
+@app.route("/login", methods=["GET"])
+def login():
+    """Log user in"""
+
+    # Forget any cookies set
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "GET":
+        return render_template("control/login.html")
+
+
+@app.route("/login_hr", methods=["POST"])
+def login_hr():
+    """Log user in"""
+
+    # Forget any cookies set
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        user = request.form.get("username")
+        passer = request.form.get("password")
+
+        # Ensure username was submitted
+        if not user:
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not passer:
+            return apology("must provide password", 403)
+            
+        
+        #check if the admin is the one who signed in
+        chck_admin1 = os.environ.get("admin1_user") == user and os.environ.get("admin1_pass") == passer
+        chck_admin2 = os.environ.get("admin2_user") == user and os.environ.get("admin2_pass") == passer 
+        chck_admin3 = os.environ.get("admin3_user") == user and os.environ.get("admin3_pass") == passer
+        if chck_admin1 or chck_admin2 or chck_admin3:
+            #set admin cookies
+            session["admin"] = user
+            session["password"] = passer
+            return redirect("control/main.html")
+        
+        return apology("invalid username and/or password", 403)
+
+@app.route("/login_man", methods=["POST"])
+def login_man():
+    """Log user in"""
+
+    # Forget any cookies set
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        user = request.form.get("username")
+        passer = request.form.get("password")
+
+        # Ensure username was submitted
+        if not user:
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not passer:
+            return apology("must provide password", 403)
+
+
+        # Query database for username
+        sel_command = users_man.select().with_only_columns([users_man.c.username, users_man.c.token, users_man.c.hash]).where(users_man.c.username == session.get("username")).limit(1)
+        sel_command = db.execute(sel_command)
+        rows = sel_command.fetchone()
+        
+
+        # Ensure username exists and password is correct
+        if rows is None:
+            return apology("invalid username and/or password", 403)
+
+        # compare hash
+        pass_chk = check_password_hash("pbkdf2:sha256:150000$" + rows[2], passer)
+        if not pass_chk:
+            return apology("invalid username and/or password", 403)
+        # Remember which user has logged in
+        session["token"] = rows[1]
+        session["username"] = rows[0]
+
+        # Redirect user to home page
+        return redirect("control/main.html")
+
+@app.route("/login_tech", methods=["POST"])
+def login_tech():
+    """Log user in"""
+
+    # Forget any cookies set
+    session.clear()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        user = request.form.get("username")
+        passer = request.form.get("password")
+
+        # Ensure username was submitted
+        if not user:
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not passer:
+            return apology("must provide password", 403)
+
+
+        # Query database for username
+        sel_command = users_tech.select().with_only_columns([users_tech.c.username, users_tech.c.token, users_tech.c.hash]).where(users_tech.c.username == session.get("username")).limit(1)
+        sel_command = db.execute(sel_command)
+        rows = sel_command.fetchone()
+        
+
+        # Ensure username exists and password is correct
+        if rows is None:
+            return apology("invalid username and/or password", 403)
+
+        # compare hash
+        pass_chk = check_password_hash("pbkdf2:sha256:150000$" + rows[2], passer)
+        if not pass_chk:
+            return apology("invalid username and/or password", 403)
+        # Remember which user has logged in
+        session["token"] = rows[1]
+        session["username"] = rows[0]
+
+        # Redirect user to home page
+        return redirect("control/main.html")
+
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
 
 
 def errorhandler(e):

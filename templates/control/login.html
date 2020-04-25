@@ -5,15 +5,15 @@
 {% endblock %}
 
 {% block main %}
-	{% if session['log_tech'] is defined %}
-    <form action="/login" method="post">
-	{% elif session['log_man'] is defined %}
-	<form action="/login" method="post">
-	{% elif session['log_hr'] is defined %}
-	<form action="/login" method="post">
+	{% if session['log_tech'] %}
+    <form action="/login_tech" method="post">
+	{% elif session['log_man'] %}
+	<form action="/login_man" method="post">
+	{% elif session['log_hr'] %}
+	<form action="/login_hr" method="post">
 	{% else %}
 	<script>
-		window.location.replace='index.html'
+		window.location='/'
 	</script>
 	{% endif%}
         <div class="form-group">
