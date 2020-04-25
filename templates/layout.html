@@ -34,23 +34,30 @@
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.admin %}
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/patient_access">Access Patient</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/devices">Devices</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/analytics">Analytics</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/staff">Staff</a></li>
-                        <!-- This can be an improvement in future version
-						<li class="nav-item"><a class="nav-link" href="/schedule">Schedule</a></li>
-						-->
-						<li class="nav-item"><a class="nav-link" href="/tests">Tests</a></li>
-						<li class="nav-item"><a class="nav-link" href="/log">Logs</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/patient_access">Add manager</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/devices">Add technician</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/analytics">Remove manager</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/staff">Remove technician</a></li>
 					</ul>
                     <ul class="navbar-nav ml-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
                     </ul>
-                {% elif session.token %}
+                {% elif session.token_man %}
 					<ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" href="/book_test">Book tests</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/results">Results</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Assign order</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Review order</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Near maintenance date</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Review devices</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Add device</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Remove device</a></li>
+                    </ul>
+                    <ul class="navbar-nav ml-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                    </ul>
+                {% elif session.token_tech %}
+					<ul class="navbar-nav mr-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/book_test">Due orders</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/results">Review orders</a></li>
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
