@@ -76,7 +76,7 @@ descriptionsData = [
 # insertDescription = device_description.insert().values(descriptionsData)
 # db.execute(insertDescription)
 
-def addExtra(d_code, name, model, manufacturer, country, recieve_day, recieve_month, recieve_year, cost, remove_day, remove_month, remove_year, status):
+def addExtra(d_code, name, model, manufacturer, country, recieve_day, recieve_month, recieve_year, cost, department, remove_day, remove_month, remove_year, status):
     dictionary = {
         'd_code': d_code,
         'name': name,
@@ -85,15 +85,16 @@ def addExtra(d_code, name, model, manufacturer, country, recieve_day, recieve_mo
         'country': country,
         'receive_date': datetime.datetime(recieve_year, recieve_month, recieve_day),
         'cost': cost,
+        'department': department,
         'remove_date': datetime.datetime(remove_year, recieve_month, recieve_day),
         'status': status
     }    
     return dictionary
 
 """"ADD YOUR DATA FOR device_extras TABLE HERE USING addExtra"""
-extraData = [
-    addExtra(1, 'XRAY-SIEMENS', 'SIEMENS-WOW', 'SIEMENES', 'EGY', 3, 11, 1998, 1111111, 20, 10, 2000, 'operational')
-]
+# extraData = [
+#     addExtra(1, 'XRAY-SIEMENS', 'SIEMENS-WOW', 'SIEMENES', 'EGY', 3, 11, 1998, 1111111, 20, 10, 2000, 'operational')
+# ]
 
 
 """ THE FOLLOWING 2 LINES ARE COMMENTED TO PREVENET ANOTHER INSERTION"""
@@ -103,7 +104,7 @@ extraData = [
 
 
 
-def addDevice(serial, deviceType, maint_date, description, name, model, manufacturer, country, recieve_date, cost, remove_date, status):
+def addDevice(serial, deviceType, maint_date, description, name, model, manufacturer, country, recieve_date, cost, department, remove_date, status):
     dateFormat = "%Y-%m-%d"
     
     # Create the Essential Data
@@ -131,5 +132,31 @@ def addDevice(serial, deviceType, maint_date, description, name, model, manufact
 
     # Inserting Description Data
     descriptionData = [descriptionDictionary]
+    insertDescription = device_description.insert().values(descriptionData)
+    db.execute(insertDescription)
+
+    # Create Extra Data 
+    extraDictionary = {
+        'd_code': code,
+        'name': name,
+        'model': model,
+        'manufacturer': manufacturer,
+        'country': country,
+        'receive_date': datetime.datetime.strptime(recieve_date, dateFormat),
+        'cost': cost,
+        'department': department,
+        'remove_date': datetime.datetime.strptime(remove_date, dateFormat),
+        'status': status
+    }
+    
+    # Insert Extra Data
+    extraData = [extraDictionary]
+    insertExtra = device_extras.insert().values(extraData)
+    db.execute(insertExtra)
+    
+
     
     
+addDevice(serial='1234567890',deviceType='XRAY',\
+    maint_date='2000-11-19', description='XRAY DEVICE', name='SIEMENS', model='SIENES-X10', manufacturer='SIEMENS-HEALTHCARE', country='EGY',\
+    recieve_date='2000-11-19', cost=1000000, department='IC', remove_date='2000-11-19', status='operational')
