@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Remove staff
+{% endblock %}
+
+{% block main %}
+{% if rem_type == "man" %}
+    <form action="/remove_man" method="post" id="form">
+	{% elif rem_type == "tech" %}
+	<form action="/remove_tech" method="post" id="form">
+	{% else %}
+	<script>
+		window.location='/'
+	</script>
+	{% endif%}
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="code" placeholder="Code" type="text">
+        </div>
+        <div class="form-group">
+			
+		<div class="form-group">
+		<label for="status">Status</label>
+        <select id="status" name="status" >
+			<option value="resigned">Resigned</option>
+			<option value="fired">Fired</option>
+		</select>
+		</div>
+		
+        <div class="form-group">
+            <input class="form-control" id="password" name="password" placeholder="Admin Password" type="password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" id="confirm" name="confirmation" placeholder="confirm password" type="password">
+        </div>
+        <button class="btn btn-primary" type="submit">Sumbit</button>
+    </form>
+{% endblock %}

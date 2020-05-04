@@ -1,16 +1,41 @@
-import os
-import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.exc import SQLAlchemyError
 
 tables = {}
 
-country_block = "country ENUM('AFG','ALA','ALB','DZA','ASM','AND','AGO','AIA','ATA','ATG','ARG','ARM','ABW','AUS','AUT','AZE','BHS','BHR','BGD','BRB','BLR','BEL','BLZ','BEN','BMU','BTN','BOL','BES','BIH','BWA','BVT','BRA','IOT','BRN','BGR','BFA','BDI','KHM','CMR','CAN','CPV','CYM','CAF','TCD','CHL','CHN','CXR','CCK','COL','COM','COG','COD','COK','CRI','CIV','HRV','CUB','CUW','CYP','CZE','DNK','DJI','DMA','DOM','ECU','EGY','SLV','GNQ','ERI','EST','ETH','FLK','FRO','FJI','FIN','FRA','GUF','PYF','ATF','GAB','GMB','GEO','DEU','GHA','GIB','GRC','GRL','GRD','GLP','GUM','GTM','GGY','GIN','GNB','GUY','HTI','HMD','VAT','HND','HKG','HUN','ISL','IND','IDN','IRN','IRQ','IRL','IMN','ISR','ITA','JAM','JPN','JEY','JOR','KAZ','KEN','KIR','PRK','KOR','KWT','KGZ','LAO','LVA','LBN','LSO','LBR','LBY','LIE','LTU','LUX','MAC','MKD','MDG','MWI','MYS','MDV','MLI','MLT','MHL','MTQ','MRT','MUS','MYT','MEX','FSM','MDA','MCO','MNG','MNE','MSR','MAR','MOZ','MMR','NAM','NRU','NPL','NLD','NCL','NZL','NIC','NER','NGA','NIU','NFK','MNP','NOR','OMN','PAK','PLW','PSE','PAN','PNG','PRY','PER','PHL','PCN','POL','PRT','PRI','QAT','REU','ROU','RUS','RWA','BLM','SHN','KNA','LCA','MAF','SPM','VCT','WSM','SMR','STP','SAU','SEN','SRB','SYC','SLE','SGP','SXM','SVK','SVN','SLB','SOM','ZAF','SGS','SSD','ESP','LKA','SDN','SUR','SJM','SWZ','SWE','CHE','SYR','TWN','TJK','TZA','THA','TLS','TGO','TKL','TON','TTO','TUN','TUR','TKM','TCA','TUV','UGA','UKR','ARE','GBR','USA','UMI','URY','UZB','VUT','VEN','VNM','VGB','VIR','WLF','ESH','YEM','ZMB','ZWE')"
+country_block = ("country ENUM('AFG','ALA','ALB','DZA','ASM','AND','AGO',"
+"'AIA','ATA','ATG','ARG','ARM','ABW','AUS','AUT','AZE','BHS','BHR','BGD',"
+"'BRB','BLR','BEL','BLZ','BEN','BMU','BTN','BOL','BES','BIH','BWA','BVT',"
+"'BRA','IOT','BRN','BGR','BFA','BDI','KHM','CMR','CAN','CPV','CYM','CAF',"
+"'TCD','CHL','CHN','CXR','CCK','COL','COM','COG','COD','COK','CRI','CIV',"
+"'HRV','CUB','CUW','CYP','CZE','DNK','DJI','DMA','DOM','ECU','EGY','SLV',"
+"'GNQ','ERI','EST','ETH','FLK','FRO','FJI','FIN','FRA','GUF','PYF','ATF',"
+"'GAB','GMB','GEO','DEU','GHA','GIB','GRC','GRL','GRD','GLP','GUM','GTM',"
+"'GGY','GIN','GNB','GUY','HTI','HMD','VAT','HND','HKG','HUN','ISL','IND',"
+"'IDN','IRN','IRQ','IRL','IMN','ISR','ITA','JAM','JPN','JEY','JOR','KAZ',"
+"'KEN','KIR','PRK','KOR','KWT','KGZ','LAO','LVA','LBN','LSO','LBR','LBY',"
+"'LIE','LTU','LUX','MAC','MKD','MDG','MWI','MYS','MDV','MLI','MLT','MHL',"
+"'MTQ','MRT','MUS','MYT','MEX','FSM','MDA','MCO','MNG','MNE','MSR','MAR',"
+"'MOZ','MMR','NAM','NRU','NPL','NLD','NCL','NZL','NIC','NER','NGA','NIU',"
+"'NFK','MNP','NOR','OMN','PAK','PLW','PSE','PAN','PNG','PRY','PER','PHL',"
+"'PCN','POL','PRT','PRI','QAT','REU','ROU','RUS','RWA','BLM','SHN','KNA',"
+"'LCA','MAF','SPM','VCT','WSM','SMR','STP','SAU','SEN','SRB','SYC','SLE',"
+"'SGP','SXM','SVK','SVN','SLB','SOM','ZAF','SGS','SSD','ESP','LKA','SDN',"
+"'SUR','SJM','SWZ','SWE','CHE','SYR','TWN','TJK','TZA','THA','TLS','TGO',"
+"'TKL','TON','TTO','TUN','TUR','TKM','TCA','TUV','UGA','UKR','ARE','GBR',"
+"'USA','UMI','URY','UZB','VUT','VEN','VNM','VGB','VIR','WLF','ESH','YEM','ZMB','ZWE')")
 
-province_block = "province ENUM('ALX','ASN','AST','BA','BH','BNS','C','DK','DT','FYM','GH','GZ','IS','JS','KB','KFS','KN','MN','MNF','MT','PTS','SHG','SHR','SIN','SUZ','WAD')"
+province_block = ("province ENUM('ALX','ASN','AST','BA','BH','BNS','C','DK',"
+"'DT','FYM','GH','GZ','IS','JS','KB','KFS','KN','MN','MNF',"
+"'MT','PTS','SHG','SHR','SIN','SUZ','WAD')")
+
+status_block = ("status ENUM ('hired','fired','resigned') NOT NULL DEFAULT 'hired'")
 
 sex_block = "sex ENUM('male', 'female') NOT NULL DEFAULT 'male'"
+
+## TODO
+department_block = "ENUM('IC', 'cardiac', 'operations')"
 
 found_block = "ENUM('found','none') NOT NULL DEFAULT 'none'"
 
@@ -19,6 +44,7 @@ available_block = "ENUM('available','not found') NOT NULL DEFAULT 'not found'"
 tables['manager_essentials'] = ("CREATE TABLE manager_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['manager_extras'] = ("CREATE TABLE manager_extras ("
@@ -46,6 +72,7 @@ tables['users_man'] = ("CREATE TABLE users_man ("
 tables['tech_essentials'] = ("CREATE TABLE tech_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['tech_extras'] = ("CREATE TABLE tech_extras ("
@@ -83,8 +110,9 @@ tables['device_extras'] = ("CREATE TABLE device_extras ("
     "" + country_block +","
     " receive_date date,"
     " cost int UNSIGNED,"
+    " department " + department_block + ","
     " remove_date date,"
-    " status ENUM('operational', 'obselete'),"
+    " status ENUM('operational', 'obselete') DEFAULT 'operational',"
     " FOREIGN KEY (d_code) REFERENCES device_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
@@ -94,14 +122,14 @@ tables['device_description'] = ("CREATE TABLE device_description ("
     " FOREIGN KEY (d_code) REFERENCES device_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
-tables['order_essentials'] = ("CREATE TABLE order_essentials("
+tables['order_essentials_defib'] = ("CREATE TABLE order_essentials("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,"
     " serial INT UNSIGNED NOT NULL DEFAULT 0,"
     " place VARCHAR(80) NOT NULL,"
     " tech_code SMALLINT UNSIGNED,"
     " date_issued DATETIME NOT NULL);")
 
-tables['order_extras'] = ("CREATE TABLE order_extras ("
+tables['order_extras_defib'] = ("CREATE TABLE order_extras ("
     " date_responded DATETIME,"
     " foreign_sub " + found_block + ","
     " cracks " + found_block + ","
@@ -118,6 +146,51 @@ tables['order_extras'] = ("CREATE TABLE order_extras ("
     " spare_batteries_avaiable " + available_block + ","
     " spare_electrodes_avaiable " + available_block + ","
     " notes VARCHAR(255) NOT NULL DEFAULT 0);")
+
+tables['report_install'] = ("CREATE TABLE report_install ("
+    " code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    " date DATE,"
+    " device_name varchar(50) NOT NULL DEFAULT '0',"
+    " device_type varchar(50) NOT NULL DEFAULT '0',"
+    " device_serial INT UNSIGNED NOT NULL DEFAULT 0,"
+    " device_manufacturer varchar(50) NOT NULL,"
+    " cost int UNSIGNED NOT NULL DEFAULT 0,"
+    " department " + department_block + ");")
+
+tables['report_move'] = ("CREATE TABLE report_move ("
+    " code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    " to_dep " + department_block + ","
+    " from_dep " + department_block + ","
+    " date DATE,"
+    " device_name varchar(50) NOT NULL DEFAULT '0',"
+    " device_type varchar(50) NOT NULL DEFAULT '0',"
+    " device_serial INT UNSIGNED NOT NULL DEFAULT 0,"
+    " device_manufacturer varchar(50) NOT NULL"
+    ");")
+
+tables['report_scrap'] = ("CREATE TABLE report_scrap ("
+    " code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    " date DATE,"
+    " device_name varchar(50) NOT NULL DEFAULT '0',"
+    " device_type varchar(50) NOT NULL DEFAULT '0',"
+    " device_serial INT UNSIGNED NOT NULL DEFAULT 0,"
+    " device_manufacturer varchar(50) NOT NULL,"
+    " cause ENUM('upgrading', 'non-functional') NOT NULL DEFAULT 'non-functional'"
+    ");")
+
+tables['report_ppm_controller'] = ("CREATE TABLE report_ppm_controller ("
+    " id MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    ## TODO
+    " type ENUM('defib', 'blood gas analyzer'),"
+    " device_code MEDIUMINT UNSIGNED NOT NULL"
+    ");")
+
+tables['maint_dates'] = ("CREATE TABLE maint_dates ("
+    " id MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    " device_code MEDIUMINT UNSIGNED NOT NULL,"
+    " maint_date DATE"
+    ");")
+    
 
 engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
 if not database_exists(engine.url):
