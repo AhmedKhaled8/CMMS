@@ -2,3 +2,4 @@ sqlalchemy
 sqlalchemy-utils
 PyMySQL
 flask
+flask_session
