@@ -46,7 +46,7 @@ device_description = reflect_table("device_description", meta, engine)
 device_extras = reflect_table("device_extras", meta, engine)
 
 
-""""ADD YOUR DATA FOR device_essentials TABLE HERE USING addDeviceEssential""""
+""""ADD YOUR DATA FOR device_essentials TABLE HERE USING addDeviceEssential"""
 essentialData = [
     addDeviceEssential(1, 1234567890, "XRAY", 30, 11, 2010)
 ]
@@ -65,7 +65,7 @@ def addDescription(code, description):
     return dictionary
 
 
-""""ADD YOUR DATA FOR device_description TABLE HERE USING addDescription""""
+""""ADD YOUR DATA FOR device_description TABLE HERE USING addDescription"""
 descriptionsData = [
     addDescription(1, "A DEVICE DISCRIPTION")
 ]
@@ -90,7 +90,7 @@ def addExtra(d_code, name, model, manufacturer, country, recieve_day, recieve_mo
     }    
     return dictionary
 
-""""ADD YOUR DATA FOR device_extras TABLE HERE USING addExtra""""
+""""ADD YOUR DATA FOR device_extras TABLE HERE USING addExtra"""
 extraData = [
     addExtra(1, 'XRAY-SIEMENS', 'SIEMENS-WOW', 'SIEMENES', 'EGY', 3, 11, 1998, 1111111, 20, 10, 2000, 'operational')
 ]
@@ -100,3 +100,36 @@ extraData = [
 """ UNCOMMENT THEM TO INSERT THE DATA """
 # insertExtra = device_extras.insert().values(extraData)
 # db.execute(insertExtra)
+
+
+
+def addDevice(serial, deviceType, maint_date, description, name, model, manufacturer, country, recieve_date, cost, remove_date, status):
+    dateFormat = "%Y-%m-%d"
+    
+    # Create the Essential Data
+    essentialDictionary = {
+        'serial': serial,
+        'type': deviceType,
+        'maint_date': datetime.datetime.strptime(maint_date, dateFormat)
+    }
+    
+    # Inserting Essential Data to device_essentials Table
+    essentialData = [essentialDictionary]
+    insertEssential = device_essentials.insert().values(essentialData)
+    db.execute(insertEssential)
+
+    # Get the Code of the Recently Registed Data
+    selectEssential = device_essentials.select().where(device_essentials.c.serial == serial)
+    selectedData = db.execute(selectEssential)
+    code = selectedData.fetchone()[0]
+    
+    # Create Description Data
+    descriptionDictionary = {
+        'd_code': code,
+        'description': description
+    }
+
+    # Inserting Description Data
+    descriptionData = [descriptionDictionary]
+    
+    
