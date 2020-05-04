@@ -287,7 +287,7 @@
 			<label for="department">Department</label>
             <select id="department" name="department">
 				{% for department in departments %}
-				{{ department }}
+				<option value = "{{ department }}">{{ department }}</option>
 				{% endfor %}
 			</select>
 		</div>

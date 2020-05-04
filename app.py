@@ -5,7 +5,6 @@ import os
 from functools import wraps
 # for token storage
 import binascii
-
 #flask functionality
 from flask import Flask, redirect, render_template, request, session
 #for cookies setting
@@ -66,13 +65,6 @@ users_tech = reflect_table("users_tech", meta, engine)
 
 # Global control variables
 departments = ('IC', 'cardiac', 'operations')
-department_select = []
-for department in departments:
-    department_select.append('<option value="' + department + '">' + department + '</option>')
-try:
-    del departments
-except:
-    print("couldn't delete departments")
 
 #check for cookies
 def check_cookies(user_type = "man"):
@@ -320,8 +312,6 @@ def register(user_table, essentials_table, extras_table, reference_name):
 
     hasher = generate_password_hash(request.form.get("password"),  method = 'pbkdf2:sha256:50000', salt_length=8)
     
-    print("hash")
-    print(hasher)
     
     # Strip hash from extra characters
     # Extra characters are "pbkdf2:sha256:50000$"
@@ -426,14 +416,72 @@ def rem_tech():
         db.execute(up_command)
         return redirect("/")
 
+def addDevice():
+    serial = request.form.get("serial")
+    deviceType = request.form.get("type")
+    maintain_date = request.form.get("maint_date")
+    description = request.form.get("description")
+    name = request.form.get("name")
+    model = request.form.get("model")
+    manufacturer = request.form.get("manufacturer")
+    country = request.form.get("country")
+    recieve_date = request.form.get("recieve_date")
+    cost = request.form.get("cost")
+    department = request.form.get("department")
+    
+    print(maintain_date)
+    
+    # Create the Essential Data
+    essentialDictionary = {
+        'serial': serial,
+        'type': deviceType,
+        'maint_date': maintain_date
+    }
+    
+    # Inserting Essential Data to device_essentials Table
+    insertEssential = device_essentials.insert().values(**essentialDictionary)
+    db.execute(insertEssential)
+
+    # Get the Code of the Recently Registed Data
+    selectEssential = device_essentials.select().where(device_essentials.c.serial == serial)
+    selectedData = db.execute(selectEssential)
+    code = selectedData.fetchone()[0]
+    
+    # Create Description Data
+    descriptionDictionary = {
+        'd_code': code,
+        'description': description
+    }
+
+    # Inserting Description Data
+    insertDescription = device_description.insert().values(**descriptionDictionary)
+    db.execute(insertDescription)
+
+    # Create Extra Data 
+    extraDictionary = {
+        'd_code': code,
+        'name': name,
+        'model': model,
+        'manufacturer': manufacturer,
+        'country': country,
+        #'receive_date': datetime.datetime.strptime(recieve_date, dateFormat),
+        'receive_date': recieve_date,
+        'cost': cost,
+        'department': department
+    }
+    
+    # Insert Extra Data
+    insertExtra = device_extras.insert().values(**extraDictionary)
+    db.execute(insertExtra)
+
 
 @app.route("/add_device", methods=["GET", "POST"])
 @login_man_required
 def add_device():
     if request.method == "GET":
-        return render_template("device/add_device.html", departments = department_select)
+        return render_template("device/add_device.html", departments = departments)
     elif request.method == "POST":
-        ## TODO
+        addDevice()
         return redirect("/")
 
 
