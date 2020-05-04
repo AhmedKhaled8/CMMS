@@ -5,19 +5,6 @@ from functools import wraps
 
 def apology(name,code):
 	return render_template("control/error.html",name=name, code=code)
-
-def login_required(f):
-    """
-    Decorate routes to require login.
-
-    http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if (session.get("token") is None) or (session.get("username") is None):
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated_function
     
 
 def admin_required(f):
