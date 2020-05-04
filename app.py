@@ -1,10 +1,10 @@
 # to get environment variables
 # and to generate random hash
 import os
-
+# for decoration functions
+from functools import wraps
 # for token storage
 import binascii
-
 #flask functionality
 from flask import Flask, redirect, render_template, request, session
 #for cookies setting
@@ -21,7 +21,7 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import func
 from sqlalchemy.exc import SQLAlchemyError
 
-from helpers import login_required,admin_required, apology, check_admins, check_admin_cookies
+from helpers import admin_required, apology, check_admins, check_admin_cookies
 
 
 # Make sure admins are set
@@ -63,6 +63,9 @@ tech_essentials = reflect_table("tech_essentials", meta, engine)
 tech_extras = reflect_table("tech_extras", meta, engine)
 users_tech = reflect_table("users_tech", meta, engine)
 
+# Global control variables
+departments = ('IC', 'cardiac', 'operations')
+
 #check for cookies
 def check_cookies(user_type = "man"):
     if user_type == "man" or user_type == "manager":
@@ -80,6 +83,19 @@ def check_cookies(user_type = "man"):
             return render_template("control/banned.html")
         return True
 
+def login_man_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        check_cookies("man")
+        return f(*args, **kwargs)
+    return decorated_function
+
+def login_tech_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        check_cookies("tech")
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Configure application
 app = Flask(__name__)
@@ -178,6 +194,7 @@ def login_hr():
         
         return apology("invalid username and/or password", 403)
 
+
 @app.route("/login_man", methods=["POST"])
 def login_man():
     """Log user in"""
@@ -189,7 +206,7 @@ def login_man():
     if request.method == "POST":
         user = request.form.get("username")
         passer = request.form.get("password")
-
+        
         # Ensure username was submitted
         if not user:
             return apology("must provide username", 403)
@@ -200,19 +217,22 @@ def login_man():
 
 
         # Query database for username
-        sel_command = users_man.select().with_only_columns([users_man.c.username, users_man.c.token, users_man.c.hash]).where(users_man.c.username == session.get("username")).limit(1)
+        sel_command = users_man.select().with_only_columns([users_man.c.username, users_man.c.token, users_man.c.hash]).where(users_man.c.username == user).limit(1)
         sel_command = db.execute(sel_command)
         rows = sel_command.fetchone()
         
-
+        
         # Ensure username exists and password is correct
         if rows is None:
-            return apology("invalid username and/or password", 403)
-
+            return apology("invalid username", 403)
+        
+        print(passer)
+        print(rows[2])
+        
         # compare hash
-        pass_chk = check_password_hash("pbkdf2:sha256:150000$" + rows[2], passer)
+        pass_chk = check_password_hash("pbkdf2:sha256:50000$" + rows[2], passer)
         if not pass_chk:
-            return apology("invalid username and/or password", 403)
+            return apology("invalid password", 403)
         # Remember which user has logged in
         session["token_man"] = rows[1]
         session["username"] = rows[0]
@@ -250,9 +270,10 @@ def login_tech():
         # Ensure username exists and password is correct
         if rows is None:
             return apology("invalid username and/or password", 403)
+        
 
         # compare hash
-        pass_chk = check_password_hash("pbkdf2:sha256:150000$" + rows[2], passer)
+        pass_chk = check_password_hash("pbkdf2:sha256:50000$" + rows[2], passer)
         if not pass_chk:
             return apology("invalid username and/or password", 403)
         # Remember which user has logged in
@@ -289,10 +310,12 @@ def register(user_table, essentials_table, extras_table, reference_name):
     if rows:
         return apology("Username already exists", 400)
 
-    hasher = generate_password_hash(request.form.get("password"))
+    hasher = generate_password_hash(request.form.get("password"),  method = 'pbkdf2:sha256:50000', salt_length=8)
+    
+    
     # Strip hash from extra characters
-    # Extra characters are "pbkdf2:sha256:150000$"
-    hasher = hasher[21:]
+    # Extra characters are "pbkdf2:sha256:50000$"
+    hasher = hasher[20:]
     
     # Make a random number for token
     token = binascii.hexlify(os.urandom(16))
@@ -357,7 +380,6 @@ def add_tech():
         session["token_tech"] = token
         session["username"] = user
         return redirect("/")
-        
 
 @app.route("/logout")
 def logout():
@@ -392,6 +414,74 @@ def rem_tech():
     elif request.method == "POST":
         up_command = tech_essentials.update().where(tech_essentials.c.code == request.form.get("code")).values(status = request.form.get("status"))
         db.execute(up_command)
+        return redirect("/")
+
+def addDevice():
+    serial = request.form.get("serial")
+    deviceType = request.form.get("type")
+    maintain_date = request.form.get("maint_date")
+    description = request.form.get("description")
+    name = request.form.get("name")
+    model = request.form.get("model")
+    manufacturer = request.form.get("manufacturer")
+    country = request.form.get("country")
+    recieve_date = request.form.get("recieve_date")
+    cost = request.form.get("cost")
+    department = request.form.get("department")
+    
+    print(maintain_date)
+    
+    # Create the Essential Data
+    essentialDictionary = {
+        'serial': serial,
+        'type': deviceType,
+        'maint_date': maintain_date
+    }
+    
+    # Inserting Essential Data to device_essentials Table
+    insertEssential = device_essentials.insert().values(**essentialDictionary)
+    db.execute(insertEssential)
+
+    # Get the Code of the Recently Registed Data
+    selectEssential = device_essentials.select().where(device_essentials.c.serial == serial)
+    selectedData = db.execute(selectEssential)
+    code = selectedData.fetchone()[0]
+    
+    # Create Description Data
+    descriptionDictionary = {
+        'd_code': code,
+        'description': description
+    }
+
+    # Inserting Description Data
+    insertDescription = device_description.insert().values(**descriptionDictionary)
+    db.execute(insertDescription)
+
+    # Create Extra Data 
+    extraDictionary = {
+        'd_code': code,
+        'name': name,
+        'model': model,
+        'manufacturer': manufacturer,
+        'country': country,
+        #'receive_date': datetime.datetime.strptime(recieve_date, dateFormat),
+        'receive_date': recieve_date,
+        'cost': cost,
+        'department': department
+    }
+    
+    # Insert Extra Data
+    insertExtra = device_extras.insert().values(**extraDictionary)
+    db.execute(insertExtra)
+
+
+@app.route("/add_device", methods=["GET", "POST"])
+@login_man_required
+def add_device():
+    if request.method == "GET":
+        return render_template("device/add_device.html", departments = departments)
+    elif request.method == "POST":
+        addDevice()
         return redirect("/")
 
 
