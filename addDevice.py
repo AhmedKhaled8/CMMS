@@ -44,7 +44,7 @@ db = engine.connect()
 device_essentials = reflect_table("device_essentials", meta, engine)
 device_description = reflect_table("device_description", meta, engine)
 device_extras = reflect_table("device_extras", meta, engine)
-
+report_install = reflect_table("report_install", meta, engine)
 
 """"ADD YOUR DATA FOR device_essentials TABLE HERE USING addDeviceEssential"""
 essentialData = [
@@ -115,8 +115,7 @@ def addDevice(serial, deviceType, maint_date, description, name, model, manufact
     }
     
     # Inserting Essential Data to device_essentials Table
-    essentialData = [essentialDictionary]
-    insertEssential = device_essentials.insert().values(essentialData)
+    insertEssential = device_essentials.insert().values(**essentialDictionary)
     db.execute(insertEssential)
 
     # Get the Code of the Recently Registed Data
@@ -131,8 +130,7 @@ def addDevice(serial, deviceType, maint_date, description, name, model, manufact
     }
 
     # Inserting Description Data
-    descriptionData = [descriptionDictionary]
-    insertDescription = device_description.insert().values(descriptionData)
+    insertDescription = device_description.insert().values(**descriptionDictionary)
     db.execute(insertDescription)
 
     # Create Extra Data 
@@ -150,13 +148,25 @@ def addDevice(serial, deviceType, maint_date, description, name, model, manufact
     }
     
     # Insert Extra Data
-    extraData = [extraDictionary]
-    insertExtra = device_extras.insert().values(extraData)
+    insertExtra = device_extras.insert().values(**extraDictionary)
     db.execute(insertExtra)
     
+    installDictionary = {
+        'code': code,
+        'date': datetime.datetime.strptime(recieve_date, dateFormat),
+        'device_name': name,
+        'device_type': deviceType,
+        'device_serial': serial,
+        'device_manufacturer': manufacturer,
+        'cost': cost, 
+        'department': department
+    }
+
+    insertInstall = report_install.insert().values(**installDictionary)
+    db.execute(insertInstall)
 
     
     
-addDevice(serial='1234567890',deviceType='XRAY',\
+addDevice(serial='1234563390',deviceType='XRAY',\
     maint_date='2000-11-19', description='XRAY DEVICE', name='SIEMENS', model='SIENES-X10', manufacturer='SIEMENS-HEALTHCARE', country='EGY',\
     recieve_date='2000-11-19', cost=1000000, department='IC', remove_date='2000-11-19', status='operational')
