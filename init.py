@@ -30,6 +30,8 @@ province_block = ("province ENUM('ALX','ASN','AST','BA','BH','BNS','C','DK',"
 "'DT','FYM','GH','GZ','IS','JS','KB','KFS','KN','MN','MNF',"
 "'MT','PTS','SHG','SHR','SIN','SUZ','WAD')")
 
+status_block = ("status ENUM ('hired','fired','resigned') NOT NULL DEFAULT 'hired'")
+
 sex_block = "sex ENUM('male', 'female') NOT NULL DEFAULT 'male'"
 
 ## TODO
@@ -42,6 +44,7 @@ available_block = "ENUM('available','not found') NOT NULL DEFAULT 'not found'"
 tables['manager_essentials'] = ("CREATE TABLE manager_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['manager_extras'] = ("CREATE TABLE manager_extras ("
@@ -69,6 +72,7 @@ tables['users_man'] = ("CREATE TABLE users_man ("
 tables['tech_essentials'] = ("CREATE TABLE tech_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['tech_extras'] = ("CREATE TABLE tech_extras ("
