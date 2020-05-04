@@ -370,6 +370,32 @@ def logout():
     return redirect("/")
 
 
+@app.route("/remove_man", methods=["GET", "POST"])
+@admin_required
+def rem_man():
+    if request.method == "GET":
+        return render_template("control/remove.html", rem_type = "man")
+    
+    # User reached route via POST (as by submitting a form via POST)
+    elif request.method == "POST":
+        up_command = manager_essentials.update().where(manager_essentials.c.code == request.form.get("code")).values(status = request.form.get("status"))
+        db.execute(up_command)
+        return redirect("/")
+        
+@app.route("/remove_tech", methods=["GET", "POST"])
+@admin_required
+def rem_tech():
+    if request.method == "GET":
+        return render_template("control/remove.html", rem_type = "tech")
+    
+    # User reached route via POST (as by submitting a form via POST)
+    elif request.method == "POST":
+        up_command = tech_essentials.update().where(tech_essentials.c.code == request.form.get("code")).values(status = request.form.get("status"))
+        db.execute(up_command)
+        return redirect("/")
+
+
+
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):

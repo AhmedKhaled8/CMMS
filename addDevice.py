@@ -46,7 +46,7 @@ device_description = reflect_table("device_description", meta, engine)
 device_extras = reflect_table("device_extras", meta, engine)
 
 
-""""ADD YOUR DATA FOR device_essentials TABLE HERE USING addDeviceEssential""""
+"""ADD YOUR DATA FOR device_essentials TABLE HERE USING addDeviceEssential"""
 essentialData = [
     addDeviceEssential(1, 1234567890, "XRAY", 30, 11, 2010)
 ]
@@ -65,7 +65,7 @@ def addDescription(code, description):
     return dictionary
 
 
-""""ADD YOUR DATA FOR device_description TABLE HERE USING addDescription""""
+"""ADD YOUR DATA FOR device_description TABLE HERE USING addDescription"""
 descriptionsData = [
     addDescription(1, "A DEVICE DISCRIPTION")
 ]
