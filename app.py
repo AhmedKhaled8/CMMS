@@ -19,7 +19,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import func
+from sqlalchemy.types import DATE
 from sqlalchemy.exc import SQLAlchemyError
+
 
 from helpers import admin_required, apology, check_admins, check_admin_cookies
 
@@ -204,17 +206,11 @@ def login_hr():
         
         return apology("invalid username and/or password", 403)
 
-
-@app.route("/login_man", methods=["POST"])
-def login_man():
-    """Log user in"""
-
-    # Forget any cookies set
-    session.clear()
-
+def loginFunction(users_table, user = None):
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        user = request.form.get("username")
+        if not user:
+            user = request.form.get("username")
         passer = request.form.get("password")
         
         # Ensure username was submitted
@@ -227,7 +223,7 @@ def login_man():
 
 
         # Query database for username
-        sel_command = users_man.select().with_only_columns([users_man.c.username, users_man.c.token, users_man.c.hash]).where(users_man.c.username == user).limit(1)
+        sel_command = users_table.select().with_only_columns([users_table.c.username, users_table.c.token, users_table.c.hash]).where(users_table.c.username == user).limit(1)
         sel_command = db.execute(sel_command)
         rows = sel_command.fetchone()
         
@@ -240,53 +236,45 @@ def login_man():
         pass_chk = check_password_hash("pbkdf2:sha256:50000$" + rows[2], passer)
         if not pass_chk:
             return apology("invalid password", 403)
-        # Remember which user has logged in
-        session["token_man"] = rows[1]
-        session["username"] = rows[0]
+        
+        # rows[0] is the user and rows[1] is the token
+        return (rows[0],rows[1])
 
+@app.route("/login_man", methods=["POST"])
+def login_man():
+    """Log user in"""
+    
+    if request.method == "POST":
+        # Forget any cookies set
+        session.clear()
+        
+        out = loginFunction(users_man)
+        if(len(out) > 2):
+            return out
+        user, token = out
+        # Remember which user has logged in
+        session["username"] = user
+        session["token_man"] = token
+    
         # Redirect user to home page
         return redirect("/")
 
 @app.route("/login_tech", methods=["POST"])
 def login_tech():
     """Log user in"""
-
-    # Forget any cookies set
-    session.clear()
-
-    # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-        user = request.form.get("username")
-        passer = request.form.get("password")
-
-        # Ensure username was submitted
-        if not user:
-            return apology("must provide username", 403)
-
-        # Ensure password was submitted
-        elif not passer:
-            return apology("must provide password", 403)
-
-
-        # Query database for username
-        sel_command = users_tech.select().with_only_columns([users_tech.c.username, users_tech.c.token, users_tech.c.hash]).where(users_tech.c.username == session.get("username")).limit(1)
-        sel_command = db.execute(sel_command)
-        rows = sel_command.fetchone()
+    
+    if request.method == "POST":    
+        # Forget any cookies set
+        session.clear()
         
-
-        # Ensure username exists and password is correct
-        if rows is None:
-            return apology("invalid username and/or password", 403)
-        
-
-        # compare hash
-        pass_chk = check_password_hash("pbkdf2:sha256:50000$" + rows[2], passer)
-        if not pass_chk:
-            return apology("invalid username and/or password", 403)
+        out = loginFunction(users_tech)
+        if(len(out) > 2):
+            return out
+        user, token = out
         # Remember which user has logged in
-        session["token_tech"] = rows[1]
-        session["username"] = rows[0]
-
+        session["username"] = user
+        session["token_tech"] = token
+    
         # Redirect user to home page
         return redirect("/")
 
@@ -461,7 +449,7 @@ def addDevice():
 
     # Inserting Description Data
     insertDescription = device_description.insert().values(**descriptionDictionary)
-    db.execute(insertDescription)
+    
 
     # Create Extra Data 
     extraDictionary = {
@@ -477,7 +465,7 @@ def addDevice():
     
     # Insert Extra Data
     insertExtra = device_extras.insert().values(**extraDictionary)
-    db.execute(insertExtra)
+    
     
     installDictionary = {
         'code': code,
@@ -491,7 +479,7 @@ def addDevice():
     }
 
     insertInstall = report_install.insert().values(**installDictionary)
-    db.execute(insertInstall)
+    
     
     maintainDictionary = {
         'device_code': code,
@@ -499,7 +487,13 @@ def addDevice():
         }
     
     insertMaintain = maintain_dates.insert().values(**maintainDictionary)
+    
+    db.execute(insertExtra)
+    db.execute(insertDescription)
+    db.execute(insertInstall)
     db.execute(insertMaintain)
+    
+    return None
 
 
 @app.route("/add_device", methods=["GET", "POST"])
@@ -511,6 +505,54 @@ def add_device():
         addDevice()
         return redirect("/")
 
+def removeDevice():
+    reportDictionary = {}
+    
+    code = request.form.get("code")
+    reportDictionary.update({"code" : code})
+    cause = request.form.get("cause")
+    reportDictionary.update({"cause" : cause})
+    
+    reportDictionary.update({"date" : func.cast(func.now(), DATE)})
+    
+    updateDevice1 = device_essentials.update().where(device_essentials.c.code == code).values(status = "obselete")
+    updateDevice2 = device_extras.update().where(device_extras.c.d_code == code).values(remove_date = func.cast(func.now(), DATE))
+    
+    selDevice = device_essentials.select().with_only_columns([device_essentials.c.serial, device_essentials.c.type]).where(device_essentials.c.code == code).limit(1)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchone()
+    reportDictionary.update({"device_serial" : rows[0]})
+    reportDictionary.update({"device_type" : rows[1]})
+    
+    selDevice = device_extras.select().with_only_columns([device_extras.c.name, device_extras.c.manufacturer]).where(device_extras.c.d_code == code).limit(1)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchone()
+    reportDictionary.update({"device_name" : rows[0]})
+    reportDictionary.update({"device_manufacturer" : rows[1]})
+    
+    insertReport = report_scrap.insert().values(**reportDictionary)
+    
+    db.execute(updateDevice1)
+    db.execute(updateDevice2)
+    db.execute(insertReport)
+    
+    return None
+
+
+@app.route("/remove_device", methods=["GET", "POST"])
+@login_man_required
+def remove_device():
+    if request.method == "GET":
+        return render_template("device/remove_device.html")
+    elif request.method == "POST":
+        user = session.get("username")
+        
+        out = loginFunction(users_man, user)
+        if(len(out) > 2):
+            return out
+        
+        removeDevice()
+        return redirect("/")
 
 
 def errorhandler(e):

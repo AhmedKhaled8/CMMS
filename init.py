@@ -100,6 +100,7 @@ tables['device_essentials'] = ("CREATE TABLE device_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " serial INT UNSIGNED NOT NULL DEFAULT 0,"
     " type varchar(50) NOT NULL DEFAULT '0',"
+    " status ENUM('operational', 'obselete') DEFAULT 'operational',"
     " maint_date date);")
 
 tables['device_extras'] = ("CREATE TABLE device_extras ("
@@ -112,7 +113,6 @@ tables['device_extras'] = ("CREATE TABLE device_extras ("
     " cost int UNSIGNED,"
     " department " + department_block + ","
     " remove_date date,"
-    " status ENUM('operational', 'obselete') DEFAULT 'operational',"
     " FOREIGN KEY (d_code) REFERENCES device_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
@@ -148,7 +148,7 @@ tables['order_extras_defib'] = ("CREATE TABLE order_extras_defib ("
     " notes VARCHAR(255) NOT NULL DEFAULT 0);")
 
 tables['report_install'] = ("CREATE TABLE report_install ("
-    " code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
+    " code MEDIUMINT UNSIGNED PRIMARY KEY,"
     " receive_date DATE,"
     " device_name varchar(50) NOT NULL DEFAULT '0',"
     " device_type varchar(50) NOT NULL DEFAULT '0',"
@@ -169,8 +169,8 @@ tables['report_move'] = ("CREATE TABLE report_move ("
     ");")
 
 tables['report_scrap'] = ("CREATE TABLE report_scrap ("
-    " code MEDIUMINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,"
-    " date DATE,"
+    " code MEDIUMINT UNSIGNED PRIMARY KEY,"
+    " date DATE NOT NULL,"
     " device_name varchar(50) NOT NULL DEFAULT '0',"
     " device_type varchar(50) NOT NULL DEFAULT '0',"
     " device_serial INT UNSIGNED NOT NULL DEFAULT 0,"

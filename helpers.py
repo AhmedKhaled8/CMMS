@@ -4,7 +4,8 @@ from flask import redirect, session,render_template
 from functools import wraps
 
 def apology(name,code):
-	return render_template("control/error.html",name=name, code=code)
+    print("Apology raised")
+    return render_template("control/error.html",name=name, code=code)
     
 
 def admin_required(f):
