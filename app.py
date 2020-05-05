@@ -51,17 +51,27 @@ def reflect_table(table_name,meta_object, engine_object):
             
 
 # Load tables into variables
-device_description = reflect_table("device_description", meta, engine)
-device_essentials = reflect_table("device_essentials", meta, engine)
-device_extras = reflect_table("device_extras", meta, engine)
 manager_essentials = reflect_table("manager_essentials", meta, engine)
 manager_extras = reflect_table("manager_extras", meta, engine)
 users_man = reflect_table("users_man", meta, engine)
-order_essentials = reflect_table("order_essentials", meta, engine)
-order_extras = reflect_table("order_extras", meta, engine)
+
 tech_essentials = reflect_table("tech_essentials", meta, engine)
 tech_extras = reflect_table("tech_extras", meta, engine)
 users_tech = reflect_table("users_tech", meta, engine)
+
+device_essentials = reflect_table("device_essentials", meta, engine)
+device_extras = reflect_table("device_extras", meta, engine)
+device_description = reflect_table("device_description", meta, engine)
+
+order_essentials_defib = reflect_table("order_essentials_defib", meta, engine)
+order_extras_defib = reflect_table("order_extras_defib", meta, engine)
+
+report_install = reflect_table("report_install", meta, engine)
+report_move = reflect_table("report_move", meta, engine)
+report_scrap = reflect_table("report_scrap", meta, engine)
+report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
+
+maintain_dates = reflect_table("maintain_dates", meta, engine)
 
 # Global control variables
 departments = ('IC', 'cardiac', 'operations')
@@ -225,9 +235,6 @@ def login_man():
         # Ensure username exists and password is correct
         if rows is None:
             return apology("invalid username", 403)
-        
-        print(passer)
-        print(rows[2])
         
         # compare hash
         pass_chk = check_password_hash("pbkdf2:sha256:50000$" + rows[2], passer)
@@ -425,11 +432,10 @@ def addDevice():
     model = request.form.get("model")
     manufacturer = request.form.get("manufacturer")
     country = request.form.get("country")
-    recieve_date = request.form.get("recieve_date")
+    receive_date = request.form.get("receive_date")
     cost = request.form.get("cost")
     department = request.form.get("department")
     
-    print(maintain_date)
     
     # Create the Essential Data
     essentialDictionary = {
@@ -464,8 +470,7 @@ def addDevice():
         'model': model,
         'manufacturer': manufacturer,
         'country': country,
-        #'receive_date': datetime.datetime.strptime(recieve_date, dateFormat),
-        'receive_date': recieve_date,
+        'receive_date': receive_date,
         'cost': cost,
         'department': department
     }
@@ -473,6 +478,28 @@ def addDevice():
     # Insert Extra Data
     insertExtra = device_extras.insert().values(**extraDictionary)
     db.execute(insertExtra)
+    
+    installDictionary = {
+        'code': code,
+        'receive_date': receive_date,
+        'device_name': name,
+        'device_type': deviceType,
+        'device_serial': serial,
+        'device_manufacturer': manufacturer,
+        'cost': cost, 
+        'department': department
+    }
+
+    insertInstall = report_install.insert().values(**installDictionary)
+    db.execute(insertInstall)
+    
+    maintainDictionary = {
+        'device_code': code,
+        'maint_date': maintain_date
+        }
+    
+    insertMaintain = maintain_dates.insert().values(**maintainDictionary)
+    db.execute(insertMaintain)
 
 
 @app.route("/add_device", methods=["GET", "POST"])
