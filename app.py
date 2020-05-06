@@ -1,6 +1,7 @@
 # to get environment variables
 # and to generate random hash
 import os
+# for date and time manipulations
 # for decoration functions
 from functools import wraps
 # for token storage
@@ -81,14 +82,16 @@ departments = ('IC', 'cardiac', 'operations')
 #check for cookies
 def check_cookies(user_type = "man"):
     if user_type == "man" or user_type == "manager":
-        sel_command = users_man.select().where(users_man.c.username == session.get("username")).where(users_man.c.token == session.get("token_man"))
+        sel_command = users_man.select().where(users_man.c.username
+           == session.get("username")).where(users_man.c.token == session.get("token_man"))
         sel_command = db.execute(sel_command)
         cookie = sel_command.fetchone()
         if cookie is None:
             return render_template("control/banned.html")
         return 1
     if user_type == "tech" or user_type == "technician":
-        sel_command = users_tech.select().where(users_tech.c.username == session.get("username")).where(users_tech.c.token == session.get("token_tech")).limit(1)
+        sel_command = users_tech.select().where(users_tech.c.username ==
+            session.get("username")).where(users_tech.c.token == session.get("token_tech")).limit(1)
         sel_command = db.execute(sel_command)
         cookie = sel_command.fetchone()
         if cookie is None:
@@ -237,7 +240,8 @@ def loginFunction(users_table, user = None):
 
 
         # Query database for username
-        sel_command = users_table.select().with_only_columns([users_table.c.username, users_table.c.token, users_table.c.hash]).where(users_table.c.username == user).limit(1)
+        sel_command = users_table.select().with_only_columns([users_table.c.username,
+              users_table.c.token, users_table.c.hash]).where(users_table.c.username == user).limit(1)
         sel_command = db.execute(sel_command)
         rows = sel_command.fetchone()
         
@@ -312,7 +316,8 @@ def register(user_table, essentials_table, extras_table, reference_name):
     elif request.form.get("password") != request.form.get("confirmation"):
         return apology("password and confirmation do not match", 400)
 
-    sel_command = user_table.select().with_only_columns([user_table.c.username]).where(user_table.c.username == session.get("username")).limit(1)
+    sel_command = user_table.select().with_only_columns([user_table.c.username]
+        ).where(user_table.c.username == session.get("username")).limit(1)
     sel_command = db.execute(sel_command)
     rows = sel_command.fetchone()
     
@@ -340,7 +345,8 @@ def register(user_table, essentials_table, extras_table, reference_name):
     insert1 = essentials_table.insert().values(name = request.form.get("name"), insurance = insurance)
     db.execute(insert1)
     # Get the unique code of the current user
-    sel_command = essentials_table.select().with_only_columns([func.max(essentials_table.c.code)]).where(essentials_table.c.name == request.form.get("name")).limit(1)
+    sel_command = essentials_table.select().with_only_columns([func.max(essentials_table.c.code)]
+          ).where(essentials_table.c.name == request.form.get("name")).limit(1)
     sel_command = db.execute(sel_command)
     code = sel_command.fetchone()[0]
     
@@ -409,7 +415,8 @@ def rem_man():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        up_command = manager_essentials.update().where(manager_essentials.c.code == request.form.get("code")).values(status = request.form.get("status"))
+        up_command = manager_essentials.update().where(manager_essentials.c.code 
+               == request.form.get("code")).values(status = request.form.get("status"))
         db.execute(up_command)
         return redirect("/")
         
@@ -421,7 +428,8 @@ def rem_tech():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        up_command = tech_essentials.update().where(tech_essentials.c.code == request.form.get("code")).values(status = request.form.get("status"))
+        up_command = tech_essentials.update().where(tech_essentials.c.code 
+            == request.form.get("code")).values(status = request.form.get("status"))
         db.execute(up_command)
         return redirect("/")
 
@@ -532,13 +540,15 @@ def removeDevice():
     updateDevice1 = device_essentials.update().where(device_essentials.c.code == code).values(status = "obselete")
     updateDevice2 = device_extras.update().where(device_extras.c.d_code == code).values(remove_date = func.cast(func.now(), DATE))
     
-    selDevice = device_essentials.select().with_only_columns([device_essentials.c.serial, device_essentials.c.type]).where(device_essentials.c.code == code).limit(1)
+    selDevice = device_essentials.select().with_only_columns([device_essentials.c.serial,
+        device_essentials.c.type]).where(device_essentials.c.code == code).limit(1)
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchone()
     reportDictionary.update({"device_serial" : rows[0]})
     reportDictionary.update({"device_type" : rows[1]})
     
-    selDevice = device_extras.select().with_only_columns([device_extras.c.name, device_extras.c.manufacturer]).where(device_extras.c.d_code == code).limit(1)
+    selDevice = device_extras.select().with_only_columns([device_extras.c.name,
+          device_extras.c.manufacturer]).where(device_extras.c.d_code == code).limit(1)
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchone()
     reportDictionary.update({"device_name" : rows[0]})
@@ -568,6 +578,125 @@ def remove_device():
         removeDevice()
         return redirect("/")
 
+def moveDevice():
+    reportDictionary = {}
+    
+    code = request.form.get("code")
+    reportDictionary.update({"device_code" : code})
+    move_date = request.form.get("move_date")
+    reportDictionary.update({"move_date" : move_date})
+    to = request.form.get("to")
+    reportDictionary.update({"to_dep" : to})
+    
+    updateDevice1 = device_extras.update().where(device_extras.c.d_code == code).values(department = to)
+    
+    selDevice = device_essentials.select().with_only_columns([device_essentials.c.serial,
+      device_essentials.c.type]).where(device_essentials.c.code == code).limit(1)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchone()
+    reportDictionary.update({"device_serial" : rows[0]})
+    reportDictionary.update({"device_type" : rows[1]})
+    
+    selDevice = device_extras.select().with_only_columns([device_extras.c.name, device_extras.c.manufacturer,
+        device_extras.c.department]).where(device_extras.c.d_code == code).limit(1)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchone()
+    reportDictionary.update({"device_name" : rows[0]})
+    reportDictionary.update({"device_manufacturer" : rows[1]})
+    reportDictionary.update({"from_dep" : rows[2]})
+    
+    insertReport = report_move.insert().values(**reportDictionary)
+    
+    db.execute(updateDevice1)
+    db.execute(insertReport)
+    
+    return None
+
+@app.route("/move_device", methods=["GET", "POST"])
+@login_man_required
+def move_device():
+    if request.method == "GET":
+        return render_template("device/move_device.html", departments = departments)
+    elif request.method == "POST":
+        user = session.get("username")
+        print(user)
+        out = loginFunction(users_man, user)
+        if(len(out) > 2):
+            return out
+        
+        moveDevice()
+        return redirect("/")
+
+# TODO add status where select only obselete or operational
+def reviewDevices(status: str = None):
+    rows = []
+    out = []
+    if status == "operational" or status == "obselete":
+        # exclude the status column
+        column_list = [col for col in device_essentials.c if col.key != "status"]
+        selDevice = device_essentials.select().with_only_columns(column_list).where(device_essentials.c.status == status)
+    else:
+        selDevice = device_essentials.select()
+        
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    for index in range(0, len(rows)):
+        selDevice = device_extras.select().where(device_extras.c.d_code == rows[index][0]).limit(1)
+        selDevice = db.execute(selDevice)
+        row = selDevice.fetchone()
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        if status == "operational" or status == "obselete":
+            rows[index][3] = rows[index][3].strftime('%d-%m-%Y')
+        else:
+            rows[index][4] = rows[index][4].strftime('%d-%m-%Y')
+            
+        # convert the date time into string
+        row = list(row)
+        row[5] = row[5].strftime('%d-%m-%Y')
+        
+        rows[index].extend(row)
+        print(rows[index])
+        num_elements = len(rows[index]) - 1
+        elements = [None]* num_elements
+        elements[0] = rows[index][0]
+        elements[1] = row[1]
+        elements[2] = row[2]
+        elements[3] = row[3]
+        elements[4] = rows[index][1]
+        elements[5] = row[7]
+        elements[6] = row[4]
+        elements[7] = rows[index][2]
+        elements[8] = row[5]
+        if status == "operational" or status == "obselete":
+            elements[9] = rows[index][3]
+            elements[10] = row[6]
+            elements[11] = row[8]
+        else:
+            elements[9] = rows[index][4]
+            elements[10] = row[6]
+            elements[11] = row[8]
+            elements[12] = rows[index][3]
+            
+        out.append(elements)
+    
+    return out
+
+@app.route("/review_devices", methods=["GET"])
+# TODO add login man
+def review_devices():
+    if request.method == "GET":
+        status = request.args.get("show")
+        if status == "operational":
+            rows = reviewDevices("operational")
+            return render_template("device/review_devices.html", status = "operational", rows = rows)
+        elif status == "obsolete":
+            rows = reviewDevices("obselete")
+            return render_template("device/review_devices.html", status = "obsolete", rows = rows)
+        else:
+            rows = reviewDevices("all")
+            return render_template("device/review_devices.html", status = "all", rows = rows)
 
 def errorhandler(e):
     """Handle error"""
