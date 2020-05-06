@@ -1,4 +1,4 @@
-export FLASK_APP=app.py
+export FLASK_APP=application.py
 export FLASK_DEBUG=1
 export admin1_user=bassam
 export admin2_user=ahmed
