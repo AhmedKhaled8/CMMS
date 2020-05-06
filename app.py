@@ -81,31 +81,45 @@ departments = ('IC', 'cardiac', 'operations')
 #check for cookies
 def check_cookies(user_type = "man"):
     if user_type == "man" or user_type == "manager":
-        sel_command = users_man.select().where(users_man.c.username == session.get("username")).where(users_man.c.token == session.get("token"))
+        sel_command = users_man.select().where(users_man.c.username == session.get("username")).where(users_man.c.token == session.get("token_man"))
         sel_command = db.execute(sel_command)
         cookie = sel_command.fetchone()
         if cookie is None:
             return render_template("control/banned.html")
-        return True
+        return 1
     if user_type == "tech" or user_type == "technician":
-        sel_command = users_tech.select().where(users_tech.c.username == session.get("username")).where(users_tech.c.token == session.get("token")).limit(1)
+        sel_command = users_tech.select().where(users_tech.c.username == session.get("username")).where(users_tech.c.token == session.get("token_tech")).limit(1)
         sel_command = db.execute(sel_command)
         cookie = sel_command.fetchone()
         if cookie is None:
             return render_template("control/banned.html")
-        return True
+        return 1
 
 def login_man_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        check_cookies("man")
+        cookie = check_cookies("man")
+        try:
+            length = len(cookie)
+        except:
+            length = len(str(cookie))
+        if length > 1:
+            return cookie
+
         return f(*args, **kwargs)
     return decorated_function
 
 def login_tech_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        check_cookies("tech")
+        cookie = check_cookies("tech")
+        try:
+            length = len(cookie)
+        except:
+            length = len(str(cookie))
+        if length > 1:
+            return cookie
+        
         return f(*args, **kwargs)
     return decorated_function
 
