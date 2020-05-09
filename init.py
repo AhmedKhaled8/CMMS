@@ -44,6 +44,7 @@ available_block = "ENUM('available','not found') NOT NULL DEFAULT 'not found'"
 tables['manager_essentials'] = ("CREATE TABLE manager_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    " department " + department_block + ","
     "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
@@ -72,6 +73,7 @@ tables['users_man'] = ("CREATE TABLE users_man ("
 tables['tech_essentials'] = ("CREATE TABLE tech_essentials ("
     " code SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,"
     " name char(80) NOT NULL,"
+    " department " + department_block + ","
     "" + status_block + ","
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
