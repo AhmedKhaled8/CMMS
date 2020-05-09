@@ -278,10 +278,16 @@
 				<option value="ZWE">Zimbabwe</option>
 			</select>
         </div>
+        
         <div class="form-group">
 			<label for="type">Device type</label>
-            <input autocomplete="off" class="form-control" id="type" name="type" placeholder="Device type" type="text">
-        </div>
+            <select id="type" name="type">
+				{% for type in device_types %}
+				<option value = "{{ type }}">{{ type }}</option>
+				{% endfor %}
+			</select>
+		</div>
+        
         
         <div class="form-group">
 			<label for="receive_date">Recieve date</label>

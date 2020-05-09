@@ -80,7 +80,12 @@ maintain_dates = reflect_table("maintain_dates", meta, engine)
 
 # Global control variables
 departments = ('Admissions', 'Open Cardiology', 'Radiology')
-
+device_types = {
+    "Admissions" : ["Defibrillator","ECG","Monitor","Syringe Pump", "Infusion Pump"],
+    "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator",
+                         "Ultrasound ECG", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
+    "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
+    }
 #check for cookies
 def check_cookies(user_type = "man"):
     if user_type == "man" or user_type == "manager":
@@ -99,6 +104,26 @@ def check_cookies(user_type = "man"):
         if cookie is None:
             return render_template("control/banned.html")
         return 1
+
+def check_department(device_code: int):
+    department = session.get("department")
+    
+    selDevice = device_essentials.select().with_only_columns([device_essentials.c.status]
+             ).where(device_essentials.c.code == device_code).limit(1)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchone()
+    if rows is None:
+        return apology("Invalid device code", 400)
+    if rows[0] == "obselete":
+        return apology("Can't control a scrapped device", 400)
+    
+    sel_command = device_extras.select().where(device_extras.c.d_code ==
+            device_code).where(device_extras.c.department == department)
+    sel_command = db.execute(sel_command)
+    department = sel_command.fetchone()
+    if department is None:
+        return apology("Forbidden, you can't control a device not in your department", 403)
+    return None
 
 def login_man_required(f):
     @wraps(f)
@@ -258,9 +283,12 @@ def loginFunction(users_table,essential_table = None, user = None):
         
         if not essential_table is None:
             sel_command = essential_table.select().with_only_columns(
-                [essential_table.c.department]).where(essential_table.c.code == rows[3]).limit(1)
+                [essential_table.c.department]).where(essential_table.c.code == rows[3]).where(essential_table.c.status == "hired").limit(1)
             sel_command = db.execute(sel_command)
-            department = sel_command.fetchone()[0]
+            department = sel_command.fetchone()
+            if department is None:
+                return apology("Your account is disabled", 403)
+            department = department[0]
             
             # rows[0] is the user and rows[1] is the token
             return (rows[0],rows[1], department)
@@ -289,15 +317,17 @@ def login_man():
         sel_command = db.execute(sel_command)
         rows = sel_command.fetchall()
         
-        due_week = datetime.date.today() + datetime.timedelta(days = 7)
+        due_week = datetime.date.today() + datetime.timedelta(days = 8)
         due_serials = []
         for row in rows:
             if (due_week > row[2]):
                 sel_command = device_essentials.select().where(device_essentials.c.code 
                         == row[0]).where(device_essentials.c.status == "operational").limit(1)
                 sel_command = db.execute(sel_command)
-                due_serials.append(["Device with serial " + str(sel_command.fetchone()[1]) + " have a maintainance date " +str(row[2])])
-        
+                row = sel_command.fetchone()
+                if row is not None:
+                    due_serials.append(["Device with serial " + str(sel_command.fetchone()[1]) + " have a maintainance date " +str(row[2])])
+                
     
         # Redirect user to home page
         return render_template("control/main.html", warning_msg = due_serials)
@@ -555,7 +585,7 @@ def addDevice():
 @login_man_required
 def add_device():
     if request.method == "GET":
-        return render_template("device/add_device.html")
+        return render_template("device/add_device.html", device_types = device_types[session.get("department")])
     elif request.method == "POST":
         addDevice()
         return redirect("/")
@@ -589,9 +619,12 @@ def removeDevice():
     
     insertReport = report_scrap.insert().values(**reportDictionary)
     
+    delete_maint = maintain_dates.delete().where(maintain_dates.c.device_code == code)
+    
     db.execute(updateDevice1)
     db.execute(updateDevice2)
     db.execute(insertReport)
+    db.execute(delete_maint)
     
     return None
 
@@ -603,8 +636,13 @@ def remove_device():
         return render_template("device/remove_device.html")
     elif request.method == "POST":
         user = session.get("username")
+        code = request.form.get("code")
+
+        out = check_department(code)
+        if out is not None:
+            return out
         
-        out = loginFunction(users_man, user)
+        out = loginFunction(users_man, user = user)
         if(len(out) > 2):
             return out
         
@@ -621,14 +659,15 @@ def moveDevice():
     to = request.form.get("to")
     reportDictionary.update({"to_dep" : to})
     
-    updateDevice1 = device_extras.update().where(device_extras.c.d_code == code).values(department = to)
-    
     selDevice = device_essentials.select().with_only_columns([device_essentials.c.serial,
-      device_essentials.c.type]).where(device_essentials.c.code == code).limit(1)
+      device_essentials.c.type,device_essentials.c.status]).where(device_essentials.c.code == code).limit(1)
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchone()
+    
     reportDictionary.update({"device_serial" : rows[0]})
     reportDictionary.update({"device_type" : rows[1]})
+        
+    updateDevice1 = device_extras.update().where(device_extras.c.d_code == code).values(department = to)
     
     selDevice = device_extras.select().with_only_columns([device_extras.c.name, device_extras.c.manufacturer,
         device_extras.c.department]).where(device_extras.c.d_code == code).limit(1)
@@ -652,12 +691,20 @@ def move_device():
         return render_template("device/move_device.html", departments = departments)
     elif request.method == "POST":
         user = session.get("username")
+        code = request.form.get("code")
         
-        out = loginFunction(users_man, user)
+        out = check_department(code)
+        if out is not None:
+            return out
+        
+        
+        out = loginFunction(users_man, user = user)
         if(len(out) > 2):
             return out
         
-        moveDevice()
+        out = moveDevice()
+        if out is not None:
+             return out
         return redirect("/")
 
 
@@ -674,9 +721,11 @@ def reviewDevices(status: str = None):
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchall()
     for index in range(0, len(rows)):
-        selDevice = device_extras.select().where(device_extras.c.d_code == rows[index][0]).limit(1)
+        selDevice = device_extras.select().where(device_extras.c.d_code == rows[index][0]).where(device_extras.c.department == session.get("department")).limit(1)
         selDevice = db.execute(selDevice)
         row = selDevice.fetchone()
+        if row is None:
+            continue
         # convert parent row to list
         rows[index] = list(rows[index])
         
@@ -742,11 +791,14 @@ def nearDates():
         == "operational").order_by(device_essentials.c.maint_date)
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchall()
-    
     for index in range(0, len(rows)):
-        selDevice = device_extras.select().where(device_extras.c.d_code == rows[index][0]).limit(1)
+        selDevice = device_extras.select().where(device_extras.c.d_code 
+             == rows[index][0]).where(device_extras.c.department == session.get("department")).limit(1)
         selDevice = db.execute(selDevice)
         row = selDevice.fetchone()
+        if row is None:
+            continue
+        
         # convert parent row to list
         rows[index] = list(rows[index])
         
@@ -773,12 +825,12 @@ def nearDates():
         elements[10] = row[6]
             
         out.append(elements)
-    
+        
     return out
 
 
 @app.route("/near_dates", methods=["GET"])
-# TODO login_man
+@login_man_required
 def near_dates():
     if request.method == "GET":
         rows = nearDates()
