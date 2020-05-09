@@ -53,6 +53,16 @@
 			<label for="phone">Phone number</label>
             <input autocomplete="off" class="form-control" id="phone" name="phone" placeholder="Phone number" type="text">
         </div>
+        
+        <div class="form-group">
+			<label for="department">Department</label>
+            <select id="department" name="department">
+				{% for department in departments %}
+				<option value = "{{ department }}">{{ department }}</option>
+				{% endfor %}
+			</select>
+		</div>
+        
         <div class="form-group">
 			<label for="insurance">Insurance number (If applicable)</label>
             <input autocomplete="off" class="form-control" id="insurance" name="insurance" placeholder="Insurance number (If applicable)" type="text">

@@ -34,8 +34,7 @@ status_block = ("status ENUM ('hired','fired','resigned') NOT NULL DEFAULT 'hire
 
 sex_block = "sex ENUM('male', 'female') NOT NULL DEFAULT 'male'"
 
-## TODO
-department_block = "ENUM('IC', 'cardiac', 'operations')"
+department_block = "ENUM('Admissions', 'Open Cardiology', 'Radiology')"
 
 found_block = "ENUM('found','none') NOT NULL DEFAULT 'none'"
 
@@ -49,14 +48,14 @@ tables['manager_essentials'] = ("CREATE TABLE manager_essentials ("
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['manager_extras'] = ("CREATE TABLE manager_extras ("
-    " m_code smallint UNSIGNED PRIMARY KEY NOT NULL,"
+    " r_code smallint UNSIGNED PRIMARY KEY NOT NULL,"
     " SSN bigint UNSIGNED NOT NULL DEFAULT 0 ,"
     "" + sex_block + ","
     " phone BIGINT UNSIGNED NOT NULL,"
     " bdate date,"
     " street varchar(100) NOT NULL DEFAULT '0',"
     "" + province_block + ","
-    " FOREIGN KEY (m_code) REFERENCES manager_essentials(code)"
+    " FOREIGN KEY (r_code) REFERENCES manager_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['users_man'] = ("CREATE TABLE users_man ("
@@ -65,8 +64,8 @@ tables['users_man'] = ("CREATE TABLE users_man ("
     " hash char(74) NOT NULL,"
     " token char(32) NOT NULL,"
     " email varchar(70) NOT NULL,"
-    " m_code smallint UNSIGNED NOT NULL,"
-    " FOREIGN KEY (m_code) REFERENCES manager_essentials(code)"
+    " r_code smallint UNSIGNED NOT NULL,"
+    " FOREIGN KEY (r_code) REFERENCES manager_essentials(code)"
 	" ON UPDATE CASCADE ON DELETE CASCADE);")
 
 
@@ -78,14 +77,14 @@ tables['tech_essentials'] = ("CREATE TABLE tech_essentials ("
     " insurance bigint UNSIGNED NOT NULL DEFAULT 0 );")
 
 tables['tech_extras'] = ("CREATE TABLE tech_extras ("
-    " t_code smallint UNSIGNED PRIMARY KEY NOT NULL,"
+    " r_code smallint UNSIGNED PRIMARY KEY NOT NULL,"
     " SSN bigint UNSIGNED NOT NULL DEFAULT 0 ,"
     "" + sex_block + ","
     " phone BIGINT UNSIGNED NOT NULL,"
     " bdate date,"
     " street varchar(100) NOT NULL DEFAULT '0',"
     "" + province_block + ","
-    " FOREIGN KEY (t_code) REFERENCES tech_essentials(code)"
+    " FOREIGN KEY (r_code) REFERENCES tech_essentials(code)"
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['users_tech'] = ("CREATE TABLE users_tech ("
@@ -94,8 +93,8 @@ tables['users_tech'] = ("CREATE TABLE users_tech ("
     " hash char(74) NOT NULL,"
     " token char(32) NOT NULL,"
     " email varchar(70) NOT NULL,"
-    " t_code smallint UNSIGNED NOT NULL,"
-    " FOREIGN KEY (t_code) REFERENCES tech_essentials(code)"
+    " r_code smallint UNSIGNED NOT NULL,"
+    " FOREIGN KEY (r_code) REFERENCES tech_essentials(code)"
 	" ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['device_essentials'] = ("CREATE TABLE device_essentials ("

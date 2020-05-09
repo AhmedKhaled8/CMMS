@@ -79,7 +79,7 @@ report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
 maintain_dates = reflect_table("maintain_dates", meta, engine)
 
 # Global control variables
-departments = ('IC', 'cardiac', 'operations')
+departments = ('Admissions', 'Open Cardiology', 'Radiology')
 
 #check for cookies
 def check_cookies(user_type = "man"):
@@ -225,7 +225,7 @@ def login_hr():
         
         return apology("invalid username and/or password", 403)
 
-def loginFunction(users_table, user = None):
+def loginFunction(users_table,essential_table = None, user = None):
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         if not user:
@@ -243,10 +243,9 @@ def loginFunction(users_table, user = None):
 
         # Query database for username
         sel_command = users_table.select().with_only_columns([users_table.c.username,
-              users_table.c.token, users_table.c.hash]).where(users_table.c.username == user).limit(1)
+              users_table.c.token, users_table.c.hash, users_table.c.r_code]).where(users_table.c.username == user).limit(1)
         sel_command = db.execute(sel_command)
         rows = sel_command.fetchone()
-        
         
         # Ensure username exists and password is correct
         if rows is None:
@@ -257,6 +256,15 @@ def loginFunction(users_table, user = None):
         if not pass_chk:
             return apology("invalid password", 403)
         
+        if not essential_table is None:
+            sel_command = essential_table.select().with_only_columns(
+                [essential_table.c.department]).where(essential_table.c.code == rows[3]).limit(1)
+            sel_command = db.execute(sel_command)
+            department = sel_command.fetchone()[0]
+            
+            # rows[0] is the user and rows[1] is the token
+            return (rows[0],rows[1], department)
+            
         # rows[0] is the user and rows[1] is the token
         return (rows[0],rows[1])
 
@@ -268,14 +276,14 @@ def login_man():
         # Forget any cookies set
         session.clear()
         
-        out = loginFunction(users_man)
-        if(len(out) > 2):
+        out = loginFunction(users_man,manager_essentials)
+        if(len(out) > 3):
             return out
-        user, token = out
+        user, token, department = out
         # Remember which user has logged in
         session["username"] = user
         session["token_man"] = token
-        
+        session["department"] = department
         
         sel_command = maintain_dates.select()
         sel_command = db.execute(sel_command)
@@ -302,13 +310,15 @@ def login_tech():
         # Forget any cookies set
         session.clear()
         
-        out = loginFunction(users_tech)
-        if(len(out) > 2):
+        out = loginFunction(users_tech,tech_essentials)
+        if(len(out) > 3):
             return out
-        user, token = out
+        user, token, department = out
+        
         # Remember which user has logged in
         session["username"] = user
         session["token_tech"] = token
+        session["department"] = department
     
         # Redirect user to home page
         return redirect("/")
@@ -352,6 +362,7 @@ def register(user_table, essentials_table, extras_table, reference_name):
     token = binascii.hexlify(os.urandom(16))
     token = token.decode("utf-8")
     
+    department = request.form.get("department")
     
     if not request.form.get("insurance") or request.form.get("insurance")== '':
         print("\n No insurance Entered")
@@ -359,7 +370,8 @@ def register(user_table, essentials_table, extras_table, reference_name):
     else:
         insurance = request.form.get("insurance")
     # Insert essentials in table
-    insert1 = essentials_table.insert().values(name = request.form.get("name"), insurance = insurance)
+    insert1 = essentials_table.insert().values(name = request.form.get("name"),
+        department = department, insurance = insurance)
     db.execute(insert1)
     # Get the unique code of the current user
     sel_command = essentials_table.select().with_only_columns([func.max(essentials_table.c.code)]
@@ -381,7 +393,7 @@ def register(user_table, essentials_table, extras_table, reference_name):
     db.execute(insert2)
     db.execute(insert3)
     
-    return token, user
+    return token, user, department
     
 
 
@@ -389,28 +401,32 @@ def register(user_table, essentials_table, extras_table, reference_name):
 @admin_required
 def add_man():
     if request.method == "GET":
-        return render_template("control/register.html", reg_type = "man")
+        return render_template("control/register.html", departments = departments, reg_type = "man")
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user = register(users_man, manager_essentials, manager_extras, "m_code")
+        token, user, department = register(users_man, manager_essentials, manager_extras, "r_code")
         # automatically login
         session["token_man"] = token
         session["username"] = user
+        session["department"] = department
+        
         return redirect("/")
         
 @app.route("/add_tech", methods=["GET", "POST"])
 @admin_required
 def add_tech():
     if request.method == "GET":
-        return render_template("control/register.html", reg_type = "tech")
+        return render_template("control/register.html", departments = departments, reg_type = "tech")
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user = register(users_tech, tech_essentials, tech_extras, "t_code")
+        token, user, department = register(users_tech, tech_essentials, tech_extras, "r_code")
         # automatically login
         session["token_tech"] = token
         session["username"] = user
+        session["department"] = department
+        
         return redirect("/")
 
 @app.route("/logout")
@@ -461,7 +477,7 @@ def addDevice():
     country = request.form.get("country")
     receive_date = request.form.get("receive_date")
     cost = request.form.get("cost")
-    department = request.form.get("department")
+    department = session.get("department")
     
     
     # Create the Essential Data
@@ -539,7 +555,7 @@ def addDevice():
 @login_man_required
 def add_device():
     if request.method == "GET":
-        return render_template("device/add_device.html", departments = departments)
+        return render_template("device/add_device.html")
     elif request.method == "POST":
         addDevice()
         return redirect("/")
