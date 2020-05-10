@@ -33,7 +33,7 @@ from helpers import admin_required, apology, check_admins, check_admin_cookies
 check_admins()
 
 # connect engine to database
-engine = create_engine("mysql+pymysql://root:123456@localhost/CMMS",echo = None)
+engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
 # make a metadata object for DB handling
 meta = MetaData()
 # make a DB_cursor object for commiting
@@ -234,11 +234,13 @@ def login_hr():
 
         # Ensure username was submitted
         if not user:
+            #return apology("must provide username", 403)
             print("POST login_hr")
             return render_template("control/login.html", err_user="Please provide a username.")
 
         # Ensure password was submitted
         elif not passer:
+            #return apology("must provide password", 403)
             return render_template("control/login.html", err_pwd="Please provide a password.")
             
         
@@ -254,6 +256,7 @@ def login_hr():
             session["password"] = passer
             return redirect("/")
         
+        #return apology("invalid username and/or password", 403)
         return render_template("control/login.html", err_user_pwd="Invalid username and/or password. Please try again.")
 
 def loginFunction(users_table,essential_table = None, user = None):
@@ -321,6 +324,8 @@ def login_man():
                 return render_template("control/login.html", err_inv_pwd="Invalid Password")
             elif out == apology("Your account is disabled", 403):
                 return render_template("control/login.html", disabled_acc="Your account is disabled")
+            else:
+                return out
 
         user, token, department = out
         # Forget any cookies set
@@ -368,6 +373,9 @@ def login_tech():
                 return render_template("control/login.html", err_inv_pwd="Invalid Password")
             elif out == apology("Your account is disabled", 403):
                 return render_template("control/login.html", disabled_acc="Your account is disabled")
+            else:
+                return out
+
 
         user, token, department = out
         # Forget any cookies set

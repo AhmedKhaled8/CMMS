@@ -172,13 +172,14 @@ tables['order_essentials'] = ("CREATE TABLE order_essentials("
     " code MEDIUMINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,"
     " serial INT UNSIGNED NOT NULL DEFAULT 0,"
     " place VARCHAR(80) NOT NULL,"
+    " type VARCHAR(80) NOT NULL,"
     " department " + department_block + ","
     " tech_code SMALLINT UNSIGNED,"
-    " date_issued DATETIME NOT NULL);")
+    " date_issued DATETIME NOT NULL,
+    " date_responded DATETIME);")
 
 # TODO reformat
 tables['order_extras_defib'] = ("CREATE TABLE order_extras_defib ("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " foreign_substance " + found_block + ","
     " cracks " + found_block + ","
@@ -200,7 +201,6 @@ tables['order_extras_defib'] = ("CREATE TABLE order_extras_defib ("
 
 
 tables['order_extras_ECG'] = ("CREATE TABLE order_extras_ECG("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " foreign_substance " + found_block + ","
     " cracks " + found_block + ","
@@ -221,7 +221,6 @@ tables['order_extras_ECG'] = ("CREATE TABLE order_extras_ECG("
 
 
 tables['order_extras_monitor'] = ("CREATE TABLE order_extras_monitor("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " cracks_in_chassis " + found_block + ","
     " cracks_in_strain_reliefs " + found_block + ","
@@ -247,7 +246,6 @@ tables['order_extras_monitor'] = ("CREATE TABLE order_extras_monitor("
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['order_extras_syringe_pump'] = ("CREATE TABLE order_extras_syringe_pump("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " cracks_in_chassis " + found_block + ","
     " cracks_in_strain_reliefs " + found_block + ","
@@ -269,7 +267,6 @@ tables['order_extras_syringe_pump'] = ("CREATE TABLE order_extras_syringe_pump("
     " ON UPDATE CASCADE ON DELETE CASCADE);")
 
 tables['order_extras_infusion_pump'] = ("CREATE TABLE order_extras_infusion_pump("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " cracks_in_chassis " + found_block + ","
     " cracks_in_strain_reliefs " + found_block + ","
@@ -294,7 +291,6 @@ tables['order_extras_infusion_pump'] = ("CREATE TABLE order_extras_infusion_pump
 
 
 tables['order_extras_blood_gas'] = ("CREATE TABLE order_extras_blood_gas("
-    " date_responded DATETIME,"
     " r_code MEDIUMINT UNSIGNED PRIMARY KEY NOT NULL,"
     " cracks_in_chassis " + found_block + ","
     " damaged_AC_plug " + found_block + ","
