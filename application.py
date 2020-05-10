@@ -86,6 +86,10 @@ device_types = {
                          "Ultrasound ECG", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
+
+# TODO Use this
+print(db.execute(manager_essentials.select().with_only_columns([manager_essentials.c['code']])).fetchone())
+
 #check for cookies
 def check_cookies(user_type = "man"):
     if user_type == "man" or user_type == "manager":
