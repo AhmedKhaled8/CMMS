@@ -33,7 +33,7 @@ from helpers import admin_required, apology, check_admins, check_admin_cookies
 check_admins()
 
 # connect engine to database
-engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
+engine = create_engine("mysql+pymysql://root:123456@localhost/CMMS",echo = None)
 # make a metadata object for DB handling
 meta = MetaData()
 # make a DB_cursor object for commiting
@@ -82,8 +82,7 @@ maintain_dates = reflect_table("maintain_dates", meta, engine)
 departments = ('Admissions', 'Open Cardiology', 'Radiology')
 device_types = {
     "Admissions" : ["Defibrillator","ECG","Monitor","Syringe Pump", "Infusion Pump"],
-    "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator",
-                         , "Blood Gas Analyzer", "Ventilator", "X-Ray"],
+    "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
 
@@ -225,21 +224,22 @@ def login():
 def login_hr():
     """Log user in"""
 
-    # Forget any cookies set
-    session.clear()
+    
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         user = request.form.get("username")
         passer = request.form.get("password")
+        
 
         # Ensure username was submitted
         if not user:
-            return apology("must provide username", 403)
+            print("POST login_hr")
+            return render_template("control/login.html", err_user="Please provide a username.")
 
         # Ensure password was submitted
         elif not passer:
-            return apology("must provide password", 403)
+            return render_template("control/login.html", err_pwd="Please provide a password.")
             
         
         #check if the admin is the one who signed in
@@ -248,11 +248,13 @@ def login_hr():
         chck_admin3 = os.environ.get("admin3_user") == user and os.environ.get("admin3_pass") == passer
         if chck_admin1 or chck_admin2 or chck_admin3:
             #set admin cookies
+            # Forget any cookies set
+            session.clear()
             session["admin"] = user
             session["password"] = passer
             return redirect("/")
         
-        return apology("invalid username and/or password", 403)
+        return render_template("control/login.html", err_user_pwd="Invalid username and/or password. Please try again.")
 
 def loginFunction(users_table,essential_table = None, user = None):
     # User reached route via POST (as by submitting a form via POST)
@@ -305,13 +307,24 @@ def login_man():
     """Log user in"""
     
     if request.method == "POST":
-        # Forget any cookies set
-        session.clear()
+       
         
         out = loginFunction(users_man,manager_essentials)
         if(len(out) > 3):
-            return out
+            if (out == apology("must provide username", 403)):
+                return render_template("control/login.html", err_user="Please provide a username")
+            elif out == apology("must provide password", 403):
+                return render_template("control/login.html", err_pwd="Please provide a password")
+            elif out == apology("invalid username", 403):
+                return render_template("control/login.html", err_inv_user="Invalid Username")
+            elif out == apology("invalid password", 403):
+                return render_template("control/login.html", err_inv_pwd="Invalid Password")
+            elif out == apology("Your account is disabled", 403):
+                return render_template("control/login.html", disabled_acc="Your account is disabled")
+
         user, token, department = out
+        # Forget any cookies set
+        session.clear()
         # Remember which user has logged in
         session["username"] = user
         session["token_man"] = token
@@ -341,14 +354,24 @@ def login_tech():
     """Log user in"""
     
     if request.method == "POST":    
-        # Forget any cookies set
-        session.clear()
+        
         
         out = loginFunction(users_tech,tech_essentials)
         if(len(out) > 3):
-            return out
+            if (out == apology("must provide username", 403)):
+                return render_template("control/login.html", err_user="Please provide a username")
+            elif out == apology("must provide password", 403):
+                return render_template("control/login.html", err_pwd="Please provide a password")
+            elif out == apology("invalid username", 403):
+                return render_template("control/login.html", err_inv_user="Invalid Username")
+            elif out == apology("invalid password", 403):
+                return render_template("control/login.html", err_inv_pwd="Invalid Password")
+            elif out == apology("Your account is disabled", 403):
+                return render_template("control/login.html", disabled_acc="Your account is disabled")
+
         user, token, department = out
-        
+        # Forget any cookies set
+        session.clear()
         # Remember which user has logged in
         session["username"] = user
         session["token_tech"] = token

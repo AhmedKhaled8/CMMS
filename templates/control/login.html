@@ -17,11 +17,30 @@
 	</script>
 	{% endif%}
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" value="{{request.form.username}}">
         </div>
+        {% if err_user %}
+        <p>Please provide a username</p>
+        {% endif %}
+        {% if err_inv_user %}
+        <p>Invalid Username</p>
+        {% endif %}
         <div class="form-group">
-            <input class="form-control" name="password" placeholder="Password" type="password">
+            <input class="form-control" name="password" placeholder="Password" type="password" value="{{request.form.password}}">
         </div>
+        {% if err_pwd %}
+        <p>Please provide a password</p>
+        {% endif %}
+        {% if err_inv_pwd %}
+        <p>Invalid Password</p>
+        {% endif %}
+        {% if disabled_acc %}
+        <p>Your account is disabled</p>
+        {% endif %}
+        
+        {% if err_user_pwd %}
+        <p>Invalid username and/or password. Please try again.</p>
+        {% endif %}
         <button class="btn btn-primary" type="submit">Log In</button>
     </form>
 {% endblock %}
