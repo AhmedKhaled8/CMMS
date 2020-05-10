@@ -83,7 +83,7 @@ departments = ('Admissions', 'Open Cardiology', 'Radiology')
 device_types = {
     "Admissions" : ["Defibrillator","ECG","Monitor","Syringe Pump", "Infusion Pump"],
     "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator",
-                         "Ultrasound ECG", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
+                         , "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
 
