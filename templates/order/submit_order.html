@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review devices
+{% endblock %}
+
+{% block main %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+        </tr>
+      </thead>
+      <tbody>
+	    {% for row in rows %}
+        <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{val[0]}}</td>
+        <div class="input-group-text">
+		<input type="checkbox" name="{{val[1]}}" aria-label="Checkbox for preceding text">
+		</div>
+        <tr>
+        {% endfor %}
+        <div class="form-group">
+			<label for="textarea">Notes</label>
+			<textarea class="form-control" id="textarea" name="notes" rows="3" maxlength="250"></textarea>
+		</div>
+      </tbody>
+    </table>
+{% endblock %}

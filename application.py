@@ -24,6 +24,7 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import func
 from sqlalchemy.types import DATE
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import and_
 
 
 from helpers import admin_required, apology, check_admins, check_admin_cookies
@@ -68,8 +69,13 @@ device_essentials = reflect_table("device_essentials", meta, engine)
 device_extras = reflect_table("device_extras", meta, engine)
 device_description = reflect_table("device_description", meta, engine)
 
-order_essentials_defib = reflect_table("order_essentials_defib", meta, engine)
+order_essentials = reflect_table("order_essentials", meta, engine)
 order_extras_defib = reflect_table("order_extras_defib", meta, engine)
+order_extras_ECG = reflect_table("order_extras_ECG", meta, engine)
+order_extras_monitor = reflect_table("order_extras_monitor", meta, engine)
+order_extras_syringe_pump = reflect_table("order_extras_syringe_pump", meta, engine)
+order_extras_infusion_pump = reflect_table("order_extras_infusion_pump", meta, engine)
+order_extras_blood_gas = reflect_table("order_extras_blood_gas", meta, engine)
 
 report_install = reflect_table("report_install", meta, engine)
 report_move = reflect_table("report_move", meta, engine)
@@ -84,6 +90,15 @@ device_types = {
     "Admissions" : ["Defibrillator","ECG","Monitor","Syringe Pump", "Infusion Pump"],
     "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
+    }
+ppm_map = {
+    "Defibrillator" : order_extras_defib,
+    "ECG" : order_extras_ECG,
+    "Monitor" : order_extras_monitor,
+    "Syringe Pump" : order_extras_syringe_pump,
+    "Infusion Pump" : order_extras_infusion_pump,
+    # TODO mobile ventilator here
+    "Blood Gas Analyzer" : order_extras_blood_gas    
     }
 
 # TODO Use this
@@ -470,12 +485,9 @@ def add_man():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user, department = register(users_man, manager_essentials, manager_extras, "r_code")
-        # automatically login
-        session["token_man"] = token
-        session["username"] = user
-        session["department"] = department
-        
+        out = register(users_man, manager_essentials, manager_extras, "r_code")
+        if(len(out) > 3):
+            return out
         return redirect("/")
         
 @app.route("/add_tech", methods=["GET", "POST"])
@@ -486,12 +498,9 @@ def add_tech():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user, department = register(users_tech, tech_essentials, tech_extras, "r_code")
-        # automatically login
-        session["token_tech"] = token
-        session["username"] = user
-        session["department"] = department
-        
+        out = register(users_tech, tech_essentials, tech_extras, "r_code")
+        if(len(out) > 3):
+            return out
         return redirect("/")
 
 @app.route("/logout")
@@ -871,6 +880,51 @@ def near_dates():
         rows = nearDates()
         return render_template("device/near_maint_dates.html", rows = rows)
 
+
+def getTech():
+    department = session.get("department")
+    selectStatment = tech_essentials.select().where(and_(tech_essentials.c.department == department, tech_essentials.c.status=="hired"))
+    selectedData = db.execute(selectStatment)
+    code_name = []
+    for tech in selectedData:
+        code = tech[0]
+        name = tech[1]
+        code_name.append([code,name])
+    return code_name
+
+
+@app.route("/assign_order", methods=["GET", "POST"])
+@login_man_required
+def assign_order():
+    if request.method == "GET":
+        techs = getTech()
+        return render_template("order/assign_order.html", techs = techs)
+    else:
+        serial = request.form.get("serial")
+        place = request.form.get("place")
+        tech_code = request.form.get("tech")
+        
+        selectStatment = device_essentials.select().where(device_essentials.c.serial == serial).limit(1)
+        selectStatment = db.execute(selectStatment)
+        device = selectStatment.fetchone()
+        
+        table = ppm_map[device[2]]
+        
+        insert1 = order_essentials.insert().values(serial = serial, place = place,
+                type = device[2], department = session.get("department"),
+                tech_code = tech_code, date_issued = func.cast(func.now(), DATE))
+        db.execute(insert1)
+        
+        sel_command = order_essentials.select().with_only_columns([func.max(order_essentials.c.code)]
+          ).where(order_essentials.c.serial == serial).limit(1)
+        sel_command = db.execute(sel_command)
+        r_code = sel_command.fetchone()[0]
+        
+        insert2 = table.insert().values(r_code = r_code)
+        db.execute(insert2)
+        
+        return redirect('/')
+        
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):

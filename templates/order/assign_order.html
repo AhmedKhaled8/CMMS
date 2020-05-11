@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Delete device
+{% endblock %}
+
+{% block main %}
+    <form action="/assign_order" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="serial" placeholder="device serial" type="text">
+        </div>
+        
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="place" placeholder="device place" type="text">
+        </div>
+        
+        <div class="form-group">
+			<label for="tech">Technician</label>
+            <select id="tech" name="tech">
+				{% for tech in techs %}
+				<option value = "{{ tech[0] }}">{{ tech[1] }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		
+		
+        <button class="btn btn-primary" type="submit">Sumbit</button>
+    </form>
+{% endblock %}
