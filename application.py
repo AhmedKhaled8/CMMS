@@ -997,6 +997,8 @@ def submit_order():
     if request.method == "GET":
         order_id = request.args.get("id")
         
+        rows = []
+        
         # check if a wrong argument is passed
         if order_id is None:
             return apology("Invalid request", 400)
@@ -1011,12 +1013,29 @@ def submit_order():
         selOrder = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
         order_essentials.c.date_responded == None).where(order_essentials.c.code == order_id).limit(1)
         selOrder = db.execute(selOrder)
-        rows = selOrder.fetchone()
+        order_ess = selOrder.fetchone()
         
-        if rows is None:
+        serial = order_ess[1]
+        place = order_ess[2]
+        device_type = order_ess[3]
+        date_issued = order_ess[6].strftime('%d-%m-%Y')
+        
+        tech_name = db.execute(tech_essentials.select().with_only_columns([tech_essentials.c['name']]
+             ).where(tech_essentials.c['code'] == order_ess[5])).fetchone()[0]
+
+        
+        if order_ess is None:
             return apology("Order not found", 404)
         
-        return redirect("/")
+        extras_table = ppm_map[device_type]
+        order_extra = extras_table.c.keys()
+        
+        size = len(order_extra) - 2
+        for index in range(1,size):
+            rows.append([order_extra[index].replace("_"," "), order_extra[index]])
+        
+        return render_template("order/submit_order.html", serial = serial, place = place,
+                device_type = device_type, date_issued = date_issued, tech_name = tech_name, rows = rows)
         
         
 
