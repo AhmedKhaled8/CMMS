@@ -924,7 +924,58 @@ def assign_order():
         db.execute(insert2)
         
         return redirect('/')
+      
+
+def reviewOrders():
+    out = []
+    
+    selDevice = order_essentials.select()
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    
+    for index in range(0, len(rows)):
+        selTech = tech_essentials.select().where(tech_essentials.c.code 
+             == rows[index][5]).with_only_columns([tech_essentials.c.name]).limit(1)
+        selTech = db.execute(selTech)
+        row = selTech.fetchone()[0]
+        if row is None:
+            continue
         
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
+        if rows[index][7] is not None:
+            rows[index][7] = rows[index][7].strftime('%d-%m-%Y')
+        
+        num_elements = 9
+        elements = [None]* num_elements
+        if rows[index][7] is None:
+            elements[0] = "No"
+        else:
+            elements[0] = "Yes"
+        elements[1] = rows[index][0]
+        elements[2] = rows[index][1]
+        elements[3] = rows[index][2]
+        elements[4] = rows[index][3]
+        elements[5] = rows[index][4]
+        elements[6] = row
+        elements[7] = rows[index][6]
+        elements[8] = rows[index][7]
+            
+        out.append(elements)
+        
+    return out
+
+@app.route("/review_orders", methods=["GET", "POST"])
+@login_man_required
+def review_orders():
+    if request.method == "GET":
+        rows = reviewOrders()
+        return render_template("order/review_orders.html", rows = rows)
+
+
+
 def errorhandler(e):
     """Handle error"""
     if not isinstance(e, HTTPException):

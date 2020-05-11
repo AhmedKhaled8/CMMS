@@ -178,7 +178,6 @@ tables['order_essentials'] = ("CREATE TABLE order_essentials("
     " date_issued DATETIME NOT NULL,"
     " date_responded DATETIME);")
 
-# TODO reformat
 tables['order_extras_defib'] = ("CREATE TABLE order_extras_defib ("
     " r_code MEDIUMINT UNSIGNED NOT NULL,"
     " foreign_substance " + found_block + ","
