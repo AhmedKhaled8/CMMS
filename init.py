@@ -176,7 +176,8 @@ tables['order_essentials'] = ("CREATE TABLE order_essentials("
     " department " + department_block + ","
     " tech_code SMALLINT UNSIGNED,"
     " date_issued DATETIME NOT NULL,"
-    " date_responded DATETIME);")
+    " date_responded DATETIME,"
+    " UNIQUE KEY (serial, date_issued));")
 
 tables['order_extras_defib'] = ("CREATE TABLE order_extras_defib ("
     " r_code MEDIUMINT UNSIGNED NOT NULL,"

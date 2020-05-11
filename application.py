@@ -47,7 +47,7 @@ def reflect_table(table_name,meta_object, engine_object):
         return table
     except SQLAlchemyError as err:
         if type(err) == sqlalchemy.exc.NoSuchTableError:
-            print("ERROR: table does not exists")
+            print("ERROR: table" + table_name + " does not exists")
             return None
         elif err.orig.args[0] == 1103:
             print("ERROR: Invalid table name")
@@ -83,6 +83,18 @@ report_scrap = reflect_table("report_scrap", meta, engine)
 report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
 
 maintain_dates = reflect_table("maintain_dates", meta, engine)
+
+# TODO remove this after debugging
+"""
+order_extras_defib.drop(engine)
+order_extras_ECG.drop(engine)
+order_extras_monitor.drop(engine)
+order_extras_syringe_pump.drop(engine)
+order_extras_infusion_pump.drop(engine)
+order_extras_blood_gas.drop(engine)
+order_essentials.drop(engine)
+"""
+
 
 # Global control variables
 departments = ('Admissions', 'Open Cardiology', 'Radiology')
@@ -913,7 +925,11 @@ def assign_order():
         insert1 = order_essentials.insert().values(serial = serial, place = place,
                 type = device[2], department = session.get("department"),
                 tech_code = tech_code, date_issued = func.cast(func.now(), DATE))
-        db.execute(insert1)
+        try:
+            db.execute(insert1)
+        except sqlalchemy.exc.IntegrityError:
+            print("Error duplicate enteries")
+            return apology("Can't enter duplicate enteries", 403)
         
         sel_command = order_essentials.select().with_only_columns([func.max(order_essentials.c.code)]
           ).where(order_essentials.c.serial == serial).limit(1)
