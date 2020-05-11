@@ -14,7 +14,9 @@
 
 
 	<form action="/submit_order" method="post" id="form">
-	    {% for val in rows %}
+		<input type="hidden" name="code" value="{{order_id}}">
+		<input type="hidden" name="device_type" value="{{device_type}}">
+		{% for val in rows %}
 	    <div class="form-group">
 			<label for="{{val[1]}}">{{val[0]}}</label>
 		<input type="checkbox" id="{{val[1]}}" name="{{val[1]}}" aria-label="Checkbox for {{val[0]}}">

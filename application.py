@@ -22,7 +22,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import func
-from sqlalchemy.types import DATE
+from sqlalchemy.types import DATE,Integer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_
 
@@ -84,6 +84,7 @@ report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
 
 maintain_dates = reflect_table("maintain_dates", meta, engine)
 
+
 # TODO remove this after debugging
 """
 order_extras_defib.drop(engine)
@@ -112,9 +113,6 @@ ppm_map = {
     # TODO mobile ventilator here
     "Blood Gas Analyzer" : order_extras_blood_gas    
     }
-
-# TODO Use this
-print(db.execute(manager_essentials.select().with_only_columns([manager_essentials.c['code']])).fetchone())
 
 #check for cookies
 def check_cookies(user_type = "man"):
@@ -1035,13 +1033,33 @@ def submit_order():
             rows.append([order_extra[index].replace("_"," "), order_extra[index]])
         
         return render_template("order/submit_order.html", serial = serial, place = place,
-                device_type = device_type, date_issued = date_issued, tech_name = tech_name, rows = rows)
+                device_type = device_type, date_issued = date_issued, tech_name = tech_name
+                ,order_id = order_id, rows = rows)
+    
+    
+    elif request.method == "POST":
+        code = request.form.get("code")
+        device_type = request.form.get("device_type")
+        
+        updateDictionary = {}
+        
+        for key in request.form.keys():
+            if (key != "code") and (key != "notes") and (key != "device_type"):
+                updateDictionary.update({key : func.cast(1, Integer)})
+
+        up_command = order_essentials.update().where(order_essentials.c.code 
+                == code).values(date_responded = func.cast(func.now(), DATE))
+        db.execute(up_command)
+        
+        extras_table = ppm_map[device_type]
+        
+        up_command = extras_table.update().where(extras_table.c.r_code == code).values(**updateDictionary)
+        db.execute(up_command)
         
         
+        return redirect('/')
 
 def dueOrders():
-    out = []
-    
     tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
              ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
     
@@ -1055,26 +1073,12 @@ def dueOrders():
         rows[index] = list(rows[index])
         
         rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
-        if rows[index][7] is not None:
-            rows[index][7] = rows[index][7].strftime('%d-%m-%Y')
         
-        num_elements = 8
-        elements = [None]* num_elements
-        if rows[index][7] is None:
-            elements[0] = "No"
-        else:
-            elements[0] = "Yes"
-        elements[1] = rows[index][0]
-        elements[2] = rows[index][1]
-        elements[3] = rows[index][2]
-        elements[4] = rows[index][3]
-        elements[5] = rows[index][4]
-        elements[6] = rows[index][6]
-        elements[7] = rows[index][7]
-            
-        out.append(elements)
+        rows[index].pop(5)
+        # 7 is now 6
+        rows[index].pop(6)
         
-    return out
+    return rows
 
 @app.route("/due_orders", methods=["GET", "POST"])
 @login_tech_required

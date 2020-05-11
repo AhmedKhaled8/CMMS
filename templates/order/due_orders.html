@@ -9,14 +9,12 @@
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Completed</th>
           <th scope="col">Order code</th>
           <th scope="col">Device Serial</th>
           <th scope="col">Place</th>
           <th scope="col">Type</th>          
           <th scope="col">Department</th>
           <th scope="col">Issue Date</th>
-          <th scope="col">Response Date</th>
         </tr>
       </thead>
       <tbody>
@@ -24,7 +22,7 @@
         <tr>
         <th scope="row">{{loop.index}}</th>
         {% for val in row %}
-        {% if loop.index == 2 %}
+        {% if loop.index == 1 %}
         <td> <a href="/submit_order?id={{val}}">{{val}}</a> </td>
         {% else %}
         <td>{{val}}</td>
