@@ -15,18 +15,20 @@
           <th scope="col">Place</th>
           <th scope="col">Type</th>          
           <th scope="col">Department</th>
-          <th scope="col">Technician name</th>
           <th scope="col">Issue Date</th>
           <th scope="col">Response Date</th>
-          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
         <tr>
         <th scope="row">{{loop.index}}</th>
-        {%for val in row %}
+        {% for val in row %}
+        {% if loop.index == 2 %}
+        <td> <a href="/submit_order?{{val}}">{{val}}</a> </td>
+        {% else %}
         <td>{{val}}</td>
+        {% endif %}
         {% endfor %}
         <tr>
         {% endfor %}

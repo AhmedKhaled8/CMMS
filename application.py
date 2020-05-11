@@ -991,6 +991,51 @@ def review_orders():
         return render_template("order/review_orders.html", rows = rows)
 
 
+# TODO add submit order here
+
+def dueOrders():
+    out = []
+    
+    tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
+             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
+    
+    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    
+    for index in range(0, len(rows)):
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
+        if rows[index][7] is not None:
+            rows[index][7] = rows[index][7].strftime('%d-%m-%Y')
+        
+        num_elements = 8
+        elements = [None]* num_elements
+        if rows[index][7] is None:
+            elements[0] = "No"
+        else:
+            elements[0] = "Yes"
+        elements[1] = rows[index][0]
+        elements[2] = rows[index][1]
+        elements[3] = rows[index][2]
+        elements[4] = rows[index][3]
+        elements[5] = rows[index][4]
+        elements[6] = rows[index][6]
+        elements[7] = rows[index][7]
+            
+        out.append(elements)
+        
+    return out
+
+@app.route("/due_orders", methods=["GET", "POST"])
+@login_tech_required
+def due_orders():
+    if request.method == "GET":
+        rows = dueOrders()
+        return render_template("order/due_orders.html", rows = rows)
+
 
 def errorhandler(e):
     """Handle error"""
