@@ -990,8 +990,35 @@ def review_orders():
         rows = reviewOrders()
         return render_template("order/review_orders.html", rows = rows)
 
-
-# TODO add submit order here
+# TODO finish submit order
+@app.route("/submit_order", methods=["GET", "POST"])
+@login_tech_required
+def submit_order():
+    if request.method == "GET":
+        order_id = request.args.get("id")
+        
+        # check if a wrong argument is passed
+        if order_id is None:
+            return apology("Invalid request", 400)
+        try:
+            order_id = int(order_id)
+        except:
+            return apology("Invalid request", 400)
+        
+        tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
+             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
+        
+        selOrder = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
+        order_essentials.c.date_responded == None).where(order_essentials.c.code == order_id).limit(1)
+        selOrder = db.execute(selOrder)
+        rows = selOrder.fetchone()
+        
+        if rows is None:
+            return apology("Order not found", 404)
+        
+        return redirect("/")
+        
+        
 
 def dueOrders():
     out = []
@@ -999,7 +1026,8 @@ def dueOrders():
     tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
              ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
     
-    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code)
+    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
+        order_essentials.c.date_responded == None)
     selDevice = db.execute(selDevice)
     rows = selDevice.fetchall()
     

@@ -25,7 +25,7 @@
         <th scope="row">{{loop.index}}</th>
         {% for val in row %}
         {% if loop.index == 2 %}
-        <td> <a href="/submit_order?{{val}}">{{val}}</a> </td>
+        <td> <a href="/submit_order?id={{val}}">{{val}}</a> </td>
         {% else %}
         <td>{{val}}</td>
         {% endif %}
