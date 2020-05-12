@@ -96,6 +96,8 @@ main img
 #user_input,
 .eye,
 #Email,
+#password,
+#confirm,
 #name,
 #SSN,
 #sex,
@@ -106,5 +108,50 @@ main img
 #address,
 #province
 {
-    margin-right: 10px;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.table
+{
+    color: white;
+    font-weight: bold;
+     width: 50%;
+     margin: 0 auto;
+     margin-bottom: 5px;
+     font-size: 18px;
+     text-transform: capitalize;
+}
+
+input[type='checkbox']:after {
+    line-height: 1.5em;
+    content: '';
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background: rgb(224,224,224);
+    }
+    input[type='checkbox']:checked:after {
+    content: '✔';
+    text-align: center;
+    }
+
+
+.form-group > label
+{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+td
+{
+    border: 1px solid black;
+}
+
+tr:nth-child(even) {background:#66dbff; color: black;}
+tr:nth-child(odd) {background: #0099cc; color: black;}
+
+textarea
+{
+    width: 25%;
 }
