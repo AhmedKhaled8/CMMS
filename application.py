@@ -22,8 +22,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import func
-from sqlalchemy.types import DATE
+from sqlalchemy.types import DATE,Integer
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import and_
 
 
 from helpers import admin_required, apology, check_admins, check_admin_cookies
@@ -46,7 +47,7 @@ def reflect_table(table_name,meta_object, engine_object):
         return table
     except SQLAlchemyError as err:
         if type(err) == sqlalchemy.exc.NoSuchTableError:
-            print("ERROR: table does not exists")
+            print("ERROR: table" + table_name + " does not exists")
             return None
         elif err.orig.args[0] == 1103:
             print("ERROR: Invalid table name")
@@ -68,8 +69,13 @@ device_essentials = reflect_table("device_essentials", meta, engine)
 device_extras = reflect_table("device_extras", meta, engine)
 device_description = reflect_table("device_description", meta, engine)
 
-order_essentials_defib = reflect_table("order_essentials_defib", meta, engine)
+order_essentials = reflect_table("order_essentials", meta, engine)
 order_extras_defib = reflect_table("order_extras_defib", meta, engine)
+order_extras_ECG = reflect_table("order_extras_ECG", meta, engine)
+order_extras_monitor = reflect_table("order_extras_monitor", meta, engine)
+order_extras_syringe_pump = reflect_table("order_extras_syringe_pump", meta, engine)
+order_extras_infusion_pump = reflect_table("order_extras_infusion_pump", meta, engine)
+order_extras_blood_gas = reflect_table("order_extras_blood_gas", meta, engine)
 
 report_install = reflect_table("report_install", meta, engine)
 report_move = reflect_table("report_move", meta, engine)
@@ -78,6 +84,19 @@ report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
 
 maintain_dates = reflect_table("maintain_dates", meta, engine)
 
+
+# TODO remove this after debugging
+"""
+order_extras_defib.drop(engine)
+order_extras_ECG.drop(engine)
+order_extras_monitor.drop(engine)
+order_extras_syringe_pump.drop(engine)
+order_extras_infusion_pump.drop(engine)
+order_extras_blood_gas.drop(engine)
+order_essentials.drop(engine)
+"""
+
+
 # Global control variables
 departments = ('Admissions', 'Open Cardiology', 'Radiology')
 device_types = {
@@ -85,9 +104,15 @@ device_types = {
     "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
-
-# TODO Use this
-print(db.execute(manager_essentials.select().with_only_columns([manager_essentials.c['code']])).fetchone())
+ppm_map = {
+    "Defibrillator" : order_extras_defib,
+    "ECG" : order_extras_ECG,
+    "Monitor" : order_extras_monitor,
+    "Syringe Pump" : order_extras_syringe_pump,
+    "Infusion Pump" : order_extras_infusion_pump,
+    # TODO mobile ventilator here
+    "Blood Gas Analyzer" : order_extras_blood_gas    
+    }
 
 #check for cookies
 def check_cookies(user_type = "man"):
@@ -470,12 +495,9 @@ def add_man():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user, department = register(users_man, manager_essentials, manager_extras, "r_code")
-        # automatically login
-        session["token_man"] = token
-        session["username"] = user
-        session["department"] = department
-        
+        out = register(users_man, manager_essentials, manager_extras, "r_code")
+        if(len(out) > 3):
+            return out
         return redirect("/")
         
 @app.route("/add_tech", methods=["GET", "POST"])
@@ -486,12 +508,9 @@ def add_tech():
     
     # User reached route via POST (as by submitting a form via POST)
     elif request.method == "POST":
-        token, user, department = register(users_tech, tech_essentials, tech_extras, "r_code")
-        # automatically login
-        session["token_tech"] = token
-        session["username"] = user
-        session["department"] = department
-        
+        out = register(users_tech, tech_essentials, tech_extras, "r_code")
+        if(len(out) > 3):
+            return out
         return redirect("/")
 
 @app.route("/logout")
@@ -870,6 +889,204 @@ def near_dates():
     if request.method == "GET":
         rows = nearDates()
         return render_template("device/near_maint_dates.html", rows = rows)
+
+
+def getTech():
+    department = session.get("department")
+    selectStatment = tech_essentials.select().where(and_(tech_essentials.c.department == department, tech_essentials.c.status=="hired"))
+    selectedData = db.execute(selectStatment)
+    code_name = []
+    for tech in selectedData:
+        code = tech[0]
+        name = tech[1]
+        code_name.append([code,name])
+    return code_name
+
+
+@app.route("/assign_order", methods=["GET", "POST"])
+@login_man_required
+def assign_order():
+    if request.method == "GET":
+        techs = getTech()
+        return render_template("order/assign_order.html", techs = techs)
+    else:
+        serial = request.form.get("serial")
+        place = request.form.get("place")
+        tech_code = request.form.get("tech")
+        
+        selectStatment = device_essentials.select().where(device_essentials.c.serial == serial).limit(1)
+        selectStatment = db.execute(selectStatment)
+        device = selectStatment.fetchone()
+        
+        table = ppm_map[device[2]]
+        
+        insert1 = order_essentials.insert().values(serial = serial, place = place,
+                type = device[2], department = session.get("department"),
+                tech_code = tech_code, date_issued = func.cast(func.now(), DATE))
+        try:
+            db.execute(insert1)
+        except sqlalchemy.exc.IntegrityError:
+            print("Error duplicate enteries")
+            return apology("Can't enter duplicate enteries", 403)
+        
+        sel_command = order_essentials.select().with_only_columns([func.max(order_essentials.c.code)]
+          ).where(order_essentials.c.serial == serial).limit(1)
+        sel_command = db.execute(sel_command)
+        r_code = sel_command.fetchone()[0]
+        
+        insert2 = table.insert().values(r_code = r_code)
+        db.execute(insert2)
+        
+        return redirect('/')
+      
+
+def reviewOrders():
+    out = []
+    
+    selDevice = order_essentials.select()
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    
+    for index in range(0, len(rows)):
+        selTech = tech_essentials.select().where(tech_essentials.c.code 
+             == rows[index][5]).with_only_columns([tech_essentials.c.name]).limit(1)
+        selTech = db.execute(selTech)
+        row = selTech.fetchone()[0]
+        if row is None:
+            continue
+        
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
+        if rows[index][7] is not None:
+            rows[index][7] = rows[index][7].strftime('%d-%m-%Y')
+        
+        num_elements = 9
+        elements = [None]* num_elements
+        if rows[index][7] is None:
+            elements[0] = "No"
+        else:
+            elements[0] = "Yes"
+        elements[1] = rows[index][0]
+        elements[2] = rows[index][1]
+        elements[3] = rows[index][2]
+        elements[4] = rows[index][3]
+        elements[5] = rows[index][4]
+        elements[6] = row
+        elements[7] = rows[index][6]
+        elements[8] = rows[index][7]
+            
+        out.append(elements)
+        
+    return out
+
+@app.route("/review_orders", methods=["GET", "POST"])
+@login_man_required
+def review_orders():
+    if request.method == "GET":
+        rows = reviewOrders()
+        return render_template("order/review_orders.html", rows = rows)
+
+# TODO finish submit order
+@app.route("/submit_order", methods=["GET", "POST"])
+@login_tech_required
+def submit_order():
+    if request.method == "GET":
+        order_id = request.args.get("id")
+        
+        rows = []
+        
+        # check if a wrong argument is passed
+        if order_id is None:
+            return apology("Invalid request", 400)
+        try:
+            order_id = int(order_id)
+        except:
+            return apology("Invalid request", 400)
+        
+        tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
+             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
+        
+        selOrder = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
+        order_essentials.c.date_responded == None).where(order_essentials.c.code == order_id).limit(1)
+        selOrder = db.execute(selOrder)
+        order_ess = selOrder.fetchone()
+        
+        serial = order_ess[1]
+        place = order_ess[2]
+        device_type = order_ess[3]
+        date_issued = order_ess[6].strftime('%d-%m-%Y')
+        
+        tech_name = db.execute(tech_essentials.select().with_only_columns([tech_essentials.c['name']]
+             ).where(tech_essentials.c['code'] == order_ess[5])).fetchone()[0]
+
+        
+        if order_ess is None:
+            return apology("Order not found", 404)
+        
+        extras_table = ppm_map[device_type]
+        order_extra = extras_table.c.keys()
+        
+        size = len(order_extra) - 2
+        for index in range(1,size):
+            rows.append([order_extra[index].replace("_"," "), order_extra[index]])
+        
+        return render_template("order/submit_order.html", serial = serial, place = place,
+                device_type = device_type, date_issued = date_issued, tech_name = tech_name
+                ,order_id = order_id, rows = rows)
+    
+    
+    elif request.method == "POST":
+        code = request.form.get("code")
+        device_type = request.form.get("device_type")
+        
+        updateDictionary = {}
+        
+        for key in request.form.keys():
+            if (key != "code") and (key != "notes") and (key != "device_type"):
+                updateDictionary.update({key : func.cast(1, Integer)})
+
+        up_command = order_essentials.update().where(order_essentials.c.code 
+                == code).values(date_responded = func.cast(func.now(), DATE))
+        db.execute(up_command)
+        
+        extras_table = ppm_map[device_type]
+        
+        up_command = extras_table.update().where(extras_table.c.r_code == code).values(**updateDictionary)
+        db.execute(up_command)
+        
+        
+        return redirect('/')
+
+def dueOrders():
+    tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
+             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
+    
+    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
+        order_essentials.c.date_responded == None)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    
+    for index in range(0, len(rows)):
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
+        
+        rows[index].pop(5)
+        # 7 is now 6
+        rows[index].pop(6)
+        
+    return rows
+
+@app.route("/due_orders", methods=["GET", "POST"])
+@login_tech_required
+def due_orders():
+    if request.method == "GET":
+        rows = dueOrders()
+        return render_template("order/due_orders.html", rows = rows)
+
 
 def errorhandler(e):
     """Handle error"""

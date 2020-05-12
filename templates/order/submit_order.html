@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review devices
+{% endblock %}
+
+{% block main %}
+<h3>{{device_type}} Operator's Checklist</h3>
+<p>This is the recommended checklist to use to inspect and test this {{device_type}}. </p>
+<p>Unit Serial No: {{serial}}</p>
+<p>Location: {{place}}</p>
+<p>Date issued: {{date_issued}}</p>
+<p>Technician name: {{tech_name}}</p>
+
+
+	<form action="/submit_order" method="post" id="form">
+		<input type="hidden" name="code" value="{{order_id}}">
+		<input type="hidden" name="device_type" value="{{device_type}}">
+		{% for val in rows %}
+	    <div class="form-group">
+			<label for="{{val[1]}}">{{val[0]}}</label>
+		<input type="checkbox" id="{{val[1]}}" name="{{val[1]}}" aria-label="Checkbox for {{val[0]}}">
+		</div>
+        {% endfor %}
+    <div class="form-group">
+			<label for="textarea">Notes</label>
+			<textarea class="form-control" id="textarea" name="notes" rows="3" maxlength="250"></textarea>
+	</div>
+	<button class="btn btn-primary" type="submit">Sumbit</button>
+{% endblock %}
