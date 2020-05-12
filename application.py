@@ -982,12 +982,82 @@ def reviewOrders():
         
     return out
 
+# TODO finish these
+@app.route("/short_ppm_report", methods=["GET"])
+@login_man_required
+def short_ppm_report():
+    if request.method == "GET":
+        return render_template("report/short_ppm_report.html", rows = rows)
+
+@app.route("/detailed_ppm_report", methods=["GET"])
+@login_man_required
+def detailed_ppm_report():
+    if request.method == "GET":
+        return render_template("report/detailed_ppm_report.html", rows = rows)
+
+@app.route("/installing_report", methods=["GET"])
+@login_man_required
+def installing_report():
+    if request.method == "GET":
+        return render_template("report/installing_report.html", rows = rows)
+
+@app.route("/moving_report", methods=["GET"])
+@login_man_required
+def moving_report():
+    if request.method == "GET":
+        
+        return render_template("report/moving_report.html", rows = rows)
+
+@app.route("/scraping_report", methods=["GET"])
+@login_man_required
+def scraping_report():
+    if request.method == "GET":
+        select_command = report_scrap.select()
+        select_command = db.execute(select_command)
+        rows = select_command.fetchall()
+        
+        return render_template("report/scraping_report.html", rows = rows)
+
+
+
 @app.route("/review_orders", methods=["GET", "POST"])
 @login_man_required
 def review_orders():
     if request.method == "GET":
         rows = reviewOrders()
         return render_template("order/review_orders.html", rows = rows)
+
+def dueOrders():
+    tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
+             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
+    
+    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
+        order_essentials.c.date_responded == None)
+    selDevice = db.execute(selDevice)
+    rows = selDevice.fetchall()
+    
+    for index in range(0, len(rows)):
+        # convert parent row to list
+        rows[index] = list(rows[index])
+        
+        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
+        
+        rows[index].pop(5)
+        # 7 is now 6
+        rows[index].pop(6)
+        
+    return rows
+
+@app.route("/due_orders", methods=["GET", "POST"])
+@login_tech_required
+def due_orders():
+    if request.method == "GET":
+        message = None
+        if session.get("message"):
+            message = session.pop("message")
+        rows = dueOrders()
+        return render_template("order/due_orders.html",message = message, rows = rows)
+
 
 @app.route("/submit_order", methods=["GET", "POST"])
 @login_tech_required
@@ -1068,37 +1138,6 @@ def submit_order():
         session["message"] = "Order submitted successfully"
         
         return redirect("/due_orders")
-
-def dueOrders():
-    tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
-             ).where(users_tech.c['username'] == session.get("username"))).fetchone()[0]
-    
-    selDevice = order_essentials.select().where(order_essentials.c.tech_code == tech_code).where(
-        order_essentials.c.date_responded == None)
-    selDevice = db.execute(selDevice)
-    rows = selDevice.fetchall()
-    
-    for index in range(0, len(rows)):
-        # convert parent row to list
-        rows[index] = list(rows[index])
-        
-        rows[index][6] = rows[index][6].strftime('%d-%m-%Y')
-        
-        rows[index].pop(5)
-        # 7 is now 6
-        rows[index].pop(6)
-        
-    return rows
-
-@app.route("/due_orders", methods=["GET", "POST"])
-@login_tech_required
-def due_orders():
-    if request.method == "GET":
-        message = None
-        if session.get("message"):
-            message = session.pop("message")
-        rows = dueOrders()
-        return render_template("order/due_orders.html",message = message, rows = rows)
 
 
 def errorhandler(e):
