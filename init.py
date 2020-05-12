@@ -155,13 +155,6 @@ tables['report_scrap'] = ("CREATE TABLE report_scrap ("
     " cause ENUM('upgrading', 'non-functional') NOT NULL DEFAULT 'non-functional'"
     ");")
 
-tables['report_ppm_controller'] = ("CREATE TABLE report_ppm_controller ("
-    " id MEDIUMINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,"
-    ## TODO
-    " type ENUM('defib', 'blood gas analyzer'),"
-    " device_code MEDIUMINT UNSIGNED NOT NULL"
-    ");")
-
 tables['maintain_dates'] = ("CREATE TABLE maintain_dates ("
     " id MEDIUMINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,"
     " device_code MEDIUMINT UNSIGNED NOT NULL,"

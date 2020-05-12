@@ -80,7 +80,6 @@ order_extras_blood_gas = reflect_table("order_extras_blood_gas", meta, engine)
 report_install = reflect_table("report_install", meta, engine)
 report_move = reflect_table("report_move", meta, engine)
 report_scrap = reflect_table("report_scrap", meta, engine)
-report_ppm_controller = reflect_table("report_ppm_controller", meta, engine)
 
 maintain_dates = reflect_table("maintain_dates", meta, engine)
 
@@ -990,7 +989,6 @@ def review_orders():
         rows = reviewOrders()
         return render_template("order/review_orders.html", rows = rows)
 
-# TODO finish submit order
 @app.route("/submit_order", methods=["GET", "POST"])
 @login_tech_required
 def submit_order():
