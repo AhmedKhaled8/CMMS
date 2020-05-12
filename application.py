@@ -1020,6 +1020,9 @@ def submit_order():
         device_type = order_ess[3]
         date_issued = order_ess[6].strftime('%d-%m-%Y')
         
+        device_code = db.execute(device_essentials.select().with_only_columns([device_essentials.c['code']]
+             ).where(device_essentials.c['serial'] == serial)).fetchone()[0]
+        
         tech_name = db.execute(tech_essentials.select().with_only_columns([tech_essentials.c['name']]
              ).where(tech_essentials.c['code'] == order_ess[5])).fetchone()[0]
 
@@ -1035,18 +1038,20 @@ def submit_order():
             rows.append([order_extra[index].replace("_"," "), order_extra[index]])
         
         return render_template("order/submit_order.html", serial = serial, place = place,
-                device_type = device_type, date_issued = date_issued, tech_name = tech_name
-                ,order_id = order_id, rows = rows)
+                device_type = device_type, device_code = device_code, date_issued = date_issued,
+                tech_name = tech_name, order_id = order_id, rows = rows)
     
     
     elif request.method == "POST":
         code = request.form.get("code")
         device_type = request.form.get("device_type")
+        device_code = request.form.get("device_code")
         
         updateDictionary = {}
         
+        ignored_keys = ["code","notes","device_code","device_type"]
         for key in request.form.keys():
-            if (key != "code") and (key != "notes") and (key != "device_type"):
+            if key not in ignored_keys:
                 updateDictionary.update({key : func.cast(1, Integer)})
 
         up_command = order_essentials.update().where(order_essentials.c.code 
@@ -1058,8 +1063,13 @@ def submit_order():
         up_command = extras_table.update().where(extras_table.c.r_code == code).values(**updateDictionary)
         db.execute(up_command)
         
+        up_command = maintain_dates.update().where(maintain_dates.c.device_code == device_code
+               ).values(maint_date = datetime.date.today() + datetime.timedelta(days = 30))
+        db.execute(up_command)
         
-        return render_template("control/main.html", message = "Order submitted successfully")
+        session["message"] = "Order submitted successfully"
+        
+        return redirect("/due_orders")
 
 def dueOrders():
     tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
@@ -1086,8 +1096,11 @@ def dueOrders():
 @login_tech_required
 def due_orders():
     if request.method == "GET":
+        message = None
+        if session.get("message"):
+            message = session.pop("message")
         rows = dueOrders()
-        return render_template("order/due_orders.html", rows = rows)
+        return render_template("order/due_orders.html",message = message, rows = rows)
 
 
 def errorhandler(e):

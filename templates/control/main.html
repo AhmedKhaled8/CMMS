@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block main %}
-//TODO
 
 {% for msg in warning_msg %}
 <div class="alert alert-warning alert-dismissible" role="alert">
@@ -22,5 +21,13 @@
 		<span aria-hidden="true">&times;</span>
 	</button>
 </div>
+{% endif %}
+
+{% if session.token_man %}
+<a class="btn btn-primary" href="/short_ppm_report" role="button">Short ppm report</a>
+<a class="btn btn-primary" href="/detailed_ppm_report" role="button">Detailed ppm report</a>
+<a class="btn btn-primary" href="/installing_report" role="button">Installing report</a>
+<a class="btn btn-primary" href="/moving_report" role="button">Moving report</a>
+<a class="btn btn-primary" href="/removing_report" role="button">Removing report</a>
 {% endif %}
 {% endblock %}
