@@ -104,6 +104,7 @@ device_types = {
     "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
+
 ppm_map = {
     "Defibrillator" : order_extras_defib,
     "ECG" : order_extras_ECG,
@@ -498,7 +499,8 @@ def add_man():
         out = register(users_man, manager_essentials, manager_extras, "r_code")
         if(len(out) > 3):
             return out
-        return redirect("/")
+        return render_template("control/main.html", message = "Manager added successfully")
+    
         
 @app.route("/add_tech", methods=["GET", "POST"])
 @admin_required
@@ -511,7 +513,7 @@ def add_tech():
         out = register(users_tech, tech_essentials, tech_extras, "r_code")
         if(len(out) > 3):
             return out
-        return redirect("/")
+        return render_template("control/main.html", message = "Technician added successfully")
 
 @app.route("/logout")
 def logout():
@@ -535,7 +537,7 @@ def rem_man():
         up_command = manager_essentials.update().where(manager_essentials.c.code 
                == request.form.get("code")).values(status = request.form.get("status"))
         db.execute(up_command)
-        return redirect("/")
+        return render_template("control/main.html", message = "Manager removed successfully")
         
 @app.route("/remove_tech", methods=["GET", "POST"])
 @admin_required
@@ -548,7 +550,7 @@ def rem_tech():
         up_command = tech_essentials.update().where(tech_essentials.c.code 
             == request.form.get("code")).values(status = request.form.get("status"))
         db.execute(up_command)
-        return redirect("/")
+        return render_template("control/main.html", message = "Technician removed successfully")
 
 def addDevice():
     serial = request.form.get("serial")
@@ -642,7 +644,7 @@ def add_device():
         return render_template("device/add_device.html", device_types = device_types[session.get("department")])
     elif request.method == "POST":
         addDevice()
-        return redirect("/")
+        return render_template("control/main.html", message = "Device added successfully")
 
 def removeDevice():
     reportDictionary = {}
@@ -701,7 +703,7 @@ def remove_device():
             return out
         
         removeDevice()
-        return redirect("/")
+        return render_template("control/main.html", message = "Device removed successfully")
 
 def moveDevice():
     reportDictionary = {}
@@ -759,7 +761,7 @@ def move_device():
         out = moveDevice()
         if out is not None:
              return out
-        return redirect("/")
+        return render_template("control/main.html", message = "Device moved successfully")
 
 
 def reviewDevices(status: str = None):
@@ -937,7 +939,7 @@ def assign_order():
         insert2 = table.insert().values(r_code = r_code)
         db.execute(insert2)
         
-        return redirect('/')
+        return render_template("control/main.html", message = "Order assigned successfully")
       
 
 def reviewOrders():
@@ -1057,7 +1059,7 @@ def submit_order():
         db.execute(up_command)
         
         
-        return redirect('/')
+        return render_template("control/main.html", message = "Order submitted successfully")
 
 def dueOrders():
     tech_code = db.execute(users_tech.select().with_only_columns([users_tech.c['r_code']]
