@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+{% if rows %}
     <table class="table">
       <thead>
         <tr>
@@ -32,4 +33,7 @@
         {% endfor %}
       </tbody>
     </table>
+{% else %}
+<h3>There is no due orders</h3>
+{% endif %}
 {% endblock %}
