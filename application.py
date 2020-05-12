@@ -213,7 +213,7 @@ def index():
         return render_template("control/main.html")
     elif session.get("token_tech"):
         check_cookies("tech")
-        return render_template("control/main.html")
+        return redirect('/due_orders')
     elif session.get("token_man"):
         check_cookies("man")
         return render_template("control/main.html")
