@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review devices
+{% endblock %}
+
+{% block main %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Code</th>
+          <th scope="col">Date</th>
+          <th scope="col">Device name</th>
+          <th scope="col">Device type</th>          
+          <th scope="col">Device serial</th>
+          <th scope="col">Device manufacturer</th>
+          <th scope="col">Cause</th>
+		</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+        <th scope="row">{{loop.index}}</th>
+        {%for val in row %}
+        <td>{{val}}</td>
+        {% endfor %}
+        <tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

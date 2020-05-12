@@ -999,12 +999,19 @@ def detailed_ppm_report():
 @login_man_required
 def installing_report():
     if request.method == "GET":
+        select_command = report_install.select()
+        select_command = db.execute(select_command)
+        rows = select_command.fetchall()
+        
         return render_template("report/installing_report.html", rows = rows)
 
 @app.route("/moving_report", methods=["GET"])
 @login_man_required
 def moving_report():
     if request.method == "GET":
+        select_command = report_move.select()
+        select_command = db.execute(select_command)
+        rows = select_command.fetchall()
         
         return render_template("report/moving_report.html", rows = rows)
 
