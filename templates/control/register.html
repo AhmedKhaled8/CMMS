@@ -17,11 +17,9 @@
         <div class="form-group">
 			<label for="user_input">Username</label>
             <input autocomplete="off" autofocus class="form-control" id="user_input" name="username" placeholder="Username" type="text" required>
-        </div>
-        <div class="form-group">
 			<label for="password">Password</label>
             <input class="form-control" id="password" name="password" placeholder="Password" type="password" pattern=".{8,}"  required title="8 characters minimum">
-			<img src="https://cdn1.iconfinder.com/data/icons/essential-21/128/Eye-512.png" padding="10px" width="20" height="20" onmouseover="mouseoverPass();" onmouseout="mouseoutPass();"/>
+			<img class="eye" src="https://cdn1.iconfinder.com/data/icons/essential-21/128/Eye-512.png" padding="10px" width="20" height="20" onmouseover="mouseoverPass();" onmouseout="mouseoutPass();"/>
 			<script>
 				function mouseoverPass(obj) {
 					var obj = document.getElementById('password');
@@ -32,11 +30,9 @@
 					obj.type = "password";
 				}
 			</script>
-		</div>
-        <div class="form-group">
 			<label for="confirm">Password confirmation</label>
 			<input class="form-control" id="confirm" name="confirmation" placeholder="confirm password" type="password" required oninput="check(this)">
-			<img src="https://cdn1.iconfinder.com/data/icons/essential-21/128/Eye-512.png" padding="10px" width="20" height="20" onmouseover="mouseoverPassConfirm();" onmouseout="mouseoutPassConfirm();"/>
+			<img src="https://cdn1.iconfinder.com/data/icons/essential-21/128/Eye-512.png" padding="10px" width="20" height="20" onmouseover="mouseoverPassConfirm();" class="eye" onmouseout="mouseoutPassConfirm();"/>
 			<script>
 				function mouseoverPassConfirm(obj) {
 					var obj = document.getElementById('confirm');
@@ -57,15 +53,12 @@
 					}
 				}
 			</script>
-        </div>
+		</div>
+		<div class="form-group">
         <label for="email">Email</label>
             <input autocomplete="off" autofocus class="form-control" id="Email" name="email" placeholder="Email" type="email" required>
-        </div>
-        <div class="form-group">
 			<label for="name">Full name</label>
             <input autocomplete="off" class="form-control" id="name" name="name" placeholder="Your full name" type="text" required>
-        </div>
-        <div class="form-group">
 			<label for="SSN">Social Security number</label>
 			<input autocomplete="off" class="form-control" id="SSN" name="SSN" placeholder="Social security number" type="text" onkeypress="return isNumberKey(event)" minlength="14" maxlength="14" required title="Enter your 14-numbered social security number">
 			<script>
@@ -84,13 +77,9 @@
 				<option value="male">Male</option>
 				<option value="female">Female</option>
 			</select>
-        </div>
-        <div class="form-group">
-			<label for="bdate">Birth day</label>
+        	<label for="bdate">Birth day</label>
             <input autocomplete="off" class="form-control" min="1970-01-01" max="2010-01-01" id="bdate" name="bdate" type="date" required>
-        </div>
-        <div class="form-group">
-			<label for="phone">Phone number</label>
+        	<label for="phone">Phone number</label>
             <input autocomplete="off" class="form-control" id="phone" name="phone" placeholder="Phone number" type="text" required onkeypress="return isNumberKey(event)" minlength="11" maxlength="11" title="Enter your phone number in 01xxxxxxxx format">
         </div>
         
@@ -101,17 +90,12 @@
 				<option value = "{{ department }}">{{ department }}</option>
 				{% endfor %}
 			</select>
-		</div>
-        
-        <div class="form-group">
-			<label for="insurance">Insurance number (If applicable)</label>
+		<label for="insurance">Insurance number (If applicable)</label>
             <input autocomplete="off" class="form-control" id="insurance" name="insurance" placeholder="Insurance number (If applicable)" type="text">
         </div>
         <div class="form-group">
 			<label for="address">Street address</label>
             <input autocomplete="off" class="form-control" id="address" name="street" placeholder="Street address" type="text" required>
-        </div>
-        <div class="form-group">
 		<label for="province">Province</label>
         <select id="province" name="province" required>
 			<option value="">Select state</option>

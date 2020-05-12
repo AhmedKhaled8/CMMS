@@ -1,3 +1,17 @@
+body
+{
+    background: url(background3.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.Title
+{
+    font-family: 'Italianno', cursive;
+}
+
 nav .navbar-brand
 {
     /* size for brand */
@@ -44,4 +58,53 @@ main img
 {
     /* constrain images on small screens */
     max-width: 100%;
+}
+
+
+.select_role
+{
+    width: 150px;
+    height: 100px;
+    margin: 20px;
+    font-size: 24px;
+}
+
+.login
+{
+    width: 150px;
+    height: 40px;
+    font-size: 20px;
+    margin: 5px;
+}
+.login_button
+{
+    width: 120px;
+    height: 50px;
+    font-size: 20px;
+}
+
+.error_mes
+{
+    color: red;
+    font-style: oblique;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+
+
+#user_input,
+.eye,
+#Email,
+#name,
+#SSN,
+#sex,
+#bdate,
+#phone,
+#department,
+#insurance,
+#address,
+#province
+{
+    margin-right: 10px;
 }

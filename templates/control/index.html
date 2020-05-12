@@ -6,14 +6,15 @@
 
 {% block main %}
 
-//TODO
+<h2>Welcome to Atlas Hospitals server.</h2>
+<h3>Please select your role.</h3>
 <form action="/set_log_man" method="post">
-	<button class="btn btn-primary" type="submit">Manager</button>
+	<button class="btn btn-primary select_role" type="submit">Manager</button>
 </form>
 <form action="/set_log_tech" method="post">
-	<button class="btn btn-primary" type="submit">Technician</button>
+	<button class="btn btn-primary select_role" type="submit">Technician</button>
 </form>
 <form action="/set_log_hr" method="post">
-	<button class="btn btn-primary" type="submit">HR</button>
+	<button class="btn btn-primary select_role" type="submit">HR</button>
 </form>
 {% endblock %}
