@@ -16,14 +16,24 @@
 	<form action="/submit_order" method="post" id="form">
 		<input type="hidden" name="code" value="{{order_id}}">
 		<input type="hidden" name="device_type" value="{{device_type}}">
+		<table class="table">
+		<thead class="thead-dark">
+			<tr>
+				<th scope="col">Test</th>
+				<th scope="col">Passed</th>
+			</tr>
+		</thead>	
+		<tbody>
 		{% for val in rows %}
-	    <div class="form-group">
-			<label for="{{val[1]}}">{{val[0]}}</label>
-		<input type="checkbox" id="{{val[1]}}" name="{{val[1]}}" aria-label="Checkbox for {{val[0]}}">
-		</div>
-        {% endfor %}
+		<tr class="bg-primary">
+			<td><label for="{{val[1]}}">{{val[0]}}</label></td>
+			<td><input type="checkbox" id="{{val[1]}}" name="{{val[1]}}" aria-label="Checkbox for {{val[0]}}"></td>
+		</tr>
+		{% endfor %}
+		</tbody>
+		</table>
     <div class="form-group">
-			<label for="textarea">Notes</label>
+			<label for="textarea">Notes</label><br>
 			<textarea class="form-control" id="textarea" name="notes" rows="3" maxlength="250"></textarea>
 	</div>
 	<button class="btn btn-primary" type="submit">Sumbit</button>
