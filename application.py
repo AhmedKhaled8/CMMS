@@ -75,7 +75,14 @@ order_extras_ECG = reflect_table("order_extras_ECG", meta, engine)
 order_extras_monitor = reflect_table("order_extras_monitor", meta, engine)
 order_extras_syringe_pump = reflect_table("order_extras_syringe_pump", meta, engine)
 order_extras_infusion_pump = reflect_table("order_extras_infusion_pump", meta, engine)
+order_extras_ventilator = reflect_table("order_extras_ventilator", meta, engine)
+order_extras_mob_ventilator = reflect_table("order_extras_mob_ventilator", meta, engine)
 order_extras_blood_gas = reflect_table("order_extras_blood_gas", meta, engine)
+order_extras_Ultrasonic = reflect_table("order_extras_Ultrasonic", meta, engine)
+order_extras_X_Ray = reflect_table("order_extras_X_Ray", meta, engine)
+order_extras_MRI = reflect_table("order_extras_MRI", meta, engine)
+order_extras_CT = reflect_table("order_extras_CT", meta, engine)
+order_extras_Gamma_Camera = reflect_table("order_extras_Gamma_Camera", meta, engine)
 
 report_install = reflect_table("report_install", meta, engine)
 report_move = reflect_table("report_move", meta, engine)
@@ -100,7 +107,7 @@ order_essentials.drop(engine)
 departments = ('Admissions', 'Open Cardiology', 'Radiology')
 device_types = {
     "Admissions" : ["Defibrillator","ECG","Monitor","Syringe Pump", "Infusion Pump"],
-    "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
+    "Open Cardiology" : ["Monitor", "Defibrillator", "Syringe Pump", "Mobile Ventilator", "Ultrasonic", "Blood Gas Analyzer", "Ventilator", "X-Ray"],
     "Radiology" : ["Ultrasonic", "X-Ray", "MRI", "CT", "Gamma Camera"]
     }
 
@@ -110,8 +117,14 @@ ppm_map = {
     "Monitor" : order_extras_monitor,
     "Syringe Pump" : order_extras_syringe_pump,
     "Infusion Pump" : order_extras_infusion_pump,
-    # TODO mobile ventilator here
-    "Blood Gas Analyzer" : order_extras_blood_gas    
+    "Ventilator" : order_extras_ventilator,
+    "Mobile Ventilator" : order_extras_mob_ventilator,
+    "Blood Gas Analyzer" : order_extras_blood_gas,
+    "Ultrasonic" : order_extras_Ultrasonic,
+    "X-Ray" : order_extras_X_Ray,
+    "MRI" : order_extras_MRI,
+    "CT" : order_extras_CT,
+    "Gamma Camera" : order_extras_Gamma_Camera    
     }
 
 #check for cookies
@@ -270,9 +283,9 @@ def login_hr():
             
         
         #check if the admin is the one who signed in
-        chck_admin1 = os.environ.get("admin1_user") == user and os.environ.get("admin1_pass") == passer
-        chck_admin2 = os.environ.get("admin2_user") == user and os.environ.get("admin2_pass") == passer 
-        chck_admin3 = os.environ.get("admin3_user") == user and os.environ.get("admin3_pass") == passer
+        chck_admin1 = "bassam" == user and "bassam" == passer
+        chck_admin2 = "ahmed" == user and "ahmed" == passer 
+        chck_admin3 = "shaden" == user and "shaden" == passer
         if chck_admin1 or chck_admin2 or chck_admin3:
             #set admin cookies
             # Forget any cookies set

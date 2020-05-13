@@ -22,12 +22,24 @@ def admin_required(f):
     return decorated_function
 
 def check_admin_cookies():
+    user = "bassam" == session.get("admin") or "ahmed" == session.get("admin") or "shaden" == session.get("admin")
+    passer = "bassam" == session.get("password") or "ahmed" == session.get("password") or "shaden" == session.get("password")
+    if user and passer:
+        return True
+    return render_template("control/banned.html")
+
+# old check_admin_cookies
+"""
+def check_admin_cookies():
     user = os.environ.get("admin1_user") == session.get("admin") or os.environ.get("admin2_user") == session.get("admin") or os.environ.get("admin3_user") == session.get("admin")
     passer = os.environ.get("admin1_pass") == session.get("password") or os.environ.get("admin2_pass") == session.get("password") or os.environ.get("admin3_pass") == session.get("password")
     if user and passer:
         return True
     return render_template("control/banned.html")
+"""
 
+# security check made with environment variables, disabled for ease of testing
+"""
 def check_admins():
     if not os.environ.get("admin1_user"):
         raise RuntimeError("admin1_user not set")
@@ -50,4 +62,4 @@ def check_admins():
         raise RuntimeError("admin3_pass not set")
         exit(1)
     return True
-
+"""
