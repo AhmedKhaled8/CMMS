@@ -10,28 +10,23 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Code</th>
-          <th scope="col">Name</th>
-          <th scope="col">Model</th>
-          <th scope="col">Manufacturer</th>          
-          <th scope="col">Serial</th>
-          <th scope="col">Department</th>
-          <th scope="col">Country</th>
-          <th scope="col">Type</th>
-          <th scope="col">Recieve date</th>
-          <th scope="col">Maintenance date</th>
-          <th scope="col">Cost</th>
-          <th scope="col">Remove date</th>
-          {% if status == "all" %}
-          <th scope="col">Status</th>
-          {% endif %}
-        </tr>
+          <th scope="col">Problems encountered</th>
+          <th scope="col">Device serial</th>
+          <th scope="col">Place</th>
+          <th scope="col">Device type</th>          
+          <th scope="col">Technician name</th>
+          <th scope="col">Date issued</th>
+          <th scope="col">Date responded</th>
+		</tr>
       </thead>
       <tbody>
         {% for row in rows %}
-        <tr>
+        <tr class="{{row[0]}}">
         <th scope="row">{{loop.index}}</th>
-        {%for val in row %}
+        {%for val in row%}
+        {% if loop.index!=1 %}
         <td>{{val}}</td>
+        {% endif %}
         {% endfor %}
         <tr>
         {% endfor %}

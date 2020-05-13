@@ -915,9 +915,13 @@ def assign_order():
         place = request.form.get("place")
         tech_code = request.form.get("tech")
         
-        selectStatment = device_essentials.select().where(device_essentials.c.serial == serial).limit(1)
+        selectStatment = device_essentials.select().where(device_essentials.c.serial == serial
+              ).where(device_essentials.c.status == "operational").limit(1)
         selectStatment = db.execute(selectStatment)
         device = selectStatment.fetchone()
+        
+        if device is None:
+            return apology("Device serial is wrong or device is scraped", 400)
         
         table = ppm_map[device[2]]
         
@@ -983,10 +987,50 @@ def reviewOrders():
     return out
 
 # TODO finish these
+
+def shortppmReport():
+    out = []
+        
+    order_ess = order_essentials.select().where(order_essentials.c.date_responded != None).where(
+        order_essentials.c.department == session.get("department"))
+    order_ess = db.execute(order_ess).fetchall()
+    
+    for order in order_ess:
+        elements = [None]*9
+        extras_table = ppm_map[order[3]]
+        order_ext = extras_table.select().where(extras_table.c['r_code'] == order[0]).limit(1)
+        order_ext = db.execute(order_ext).fetchone()
+        
+        tech_name = db.execute(tech_essentials.select().with_only_columns([tech_essentials.c['name']]
+         ).where(tech_essentials.c['code'] == order[5])).fetchone()[0]
+        
+        for value in order_ext:
+            if value == "found" or value == "not found":
+                print(value)
+                elements[0] = "red"
+                elements[2] = "Yes"
+                break
+        if elements[0] is None:
+            elements[0] ="green"
+            elements[2] = "No"
+        
+        elements[1] = order[0]
+        elements[3] = order[1]
+        elements[4] = order[2]
+        elements[5] = order[3]
+        elements[6] = tech_name
+        elements[7] = order[6]
+        elements[8] = order[7]
+        out.append(elements)
+    
+    return out
+    
+
 @app.route("/short_ppm_report", methods=["GET"])
 @login_man_required
 def short_ppm_report():
     if request.method == "GET":
+        rows = shortppmReport()
         return render_template("report/short_ppm_report.html", rows = rows)
 
 @app.route("/detailed_ppm_report", methods=["GET"])
@@ -1108,7 +1152,7 @@ def submit_order():
         extras_table = ppm_map[device_type]
         order_extra = extras_table.c.keys()
         
-        size = len(order_extra) - 2
+        size = len(order_extra) - 1
         for index in range(1,size):
             rows.append([order_extra[index].replace("_"," "), order_extra[index]])
         
@@ -1135,8 +1179,9 @@ def submit_order():
         
         extras_table = ppm_map[device_type]
         
-        up_command = extras_table.update().where(extras_table.c.r_code == code).values(**updateDictionary)
-        db.execute(up_command)
+        if len(updateDictionary) != 0:
+            up_command = extras_table.update().where(extras_table.c.r_code == code).values(**updateDictionary)
+            db.execute(up_command)
         
         up_command = maintain_dates.update().where(maintain_dates.c.device_code == device_code
                ).values(maint_date = datetime.date.today() + datetime.timedelta(days = 30))
