@@ -1033,9 +1033,72 @@ def short_ppm_report():
         rows = shortppmReport()
         return render_template("report/short_ppm_report.html", rows = rows)
 
+
+def detailedppmReport():
+    out = []
+        
+    column_list = [col for col in order_essentials.c if col.key != "department"]
+    order_ess = order_essentials.select().with_only_columns(column_list).where(order_essentials.c.date_responded != None).where(
+        order_essentials.c.department == session.get("department"))
+    order_ess = db.execute(order_ess).fetchall()
+    
+    col_append = [col for col in order_essentials.c.keys() if col != "department"]
+    
+    for order in order_ess:
+        
+        extras_table = ppm_map[order[3]]
+        headers = []
+        values = []
+        
+        headers.extend(col_append)
+        values.extend(order)
+        
+        order_ext = extras_table.select().where(extras_table.c['r_code'] == order[0]).limit(1)
+        order_ext = db.execute(order_ext).fetchone()
+        
+        tech_name = db.execute(tech_essentials.select().with_only_columns([tech_essentials.c['name']]
+         ).where(tech_essentials.c['code'] == order[4])).fetchone()[0]
+        
+        headers[4] = "Tech name"
+        values[4] = tech_name
+        
+        head_order_ext = list(extras_table.c.keys())
+        head_order_ext.pop(0)
+        
+        val_order_ext = list(order_ext)
+        val_order_ext.pop(0)
+        
+        headers.extend(head_order_ext)
+        values.extend(val_order_ext)
+        """
+        for value in order_ext:
+            if value == "found" or value == "not found":
+                print(value)
+                elements[0] = "red"
+                elements[2] = "Yes"
+                break
+        if elements[0] is None:
+            elements[0] ="green"
+            elements[2] = "No"
+        
+        elements[1] = order[0]
+        elements[3] = order[1]
+        elements[4] = order[2]
+        elements[5] = order[3]
+        elements[6] = tech_name
+        elements[7] = order[6]
+        elements[8] = order[7]
+        out.append(elements)
+        """
+        out.append([headers,values])
+    
+    return out
+
+
 @app.route("/detailed_ppm_report", methods=["GET"])
 @login_man_required
 def detailed_ppm_report():
+    rows = detailedppmReport()
     if request.method == "GET":
         return render_template("report/detailed_ppm_report.html", rows = rows)
 
