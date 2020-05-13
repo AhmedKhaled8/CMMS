@@ -1090,7 +1090,7 @@ def detailedppmReport():
         elements[8] = order[7]
         out.append(elements)
         """
-        out.append([headers,values])
+        out.append(list(zip(headers,values)))
     
     return out
 

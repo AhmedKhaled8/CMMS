@@ -8,20 +8,15 @@
 
 {% for row in rows %}
     <table class="table">
-      <thead>
-        <tr>
-			{% for header in row[0] %}
-			<th scope="col">{{header}}</th>
-			{% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-        {%for value in row[1] %}
-        <td>{{value}}</td>
-        {% endfor %}
-        <tr>
+		<tbody>
+			{% for val in row %}
+		<tr>
+			<td>{{val[0]}}</td>
+			<td>{{val[1]}}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+		</table>
 {% endfor %}
-      </tbody>
-    </table>
+
 {% endblock %}

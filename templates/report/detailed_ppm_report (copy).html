@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review devices
+{% endblock %}
+
+{% block main %}
+
+{% for row in rows %}
+    <table class="table">
+      <thead>
+        <tr>
+			{% for header in row[0] %}
+			<th scope="col">{{header}}</th>
+			{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+        {%for value in row[1] %}
+        <td>{{value}}</td>
+        {% endfor %}
+        <tr>
+{% endfor %}
+      </tbody>
+    </table>
+{% endblock %}
