@@ -27,11 +27,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_
 
 
-from helpers import admin_required, apology, check_admins, check_admin_cookies
+from helpers import admin_required, apology, check_admin_cookies
 
 
 # Make sure admins are set
-check_admins()
+#check_admins()
 
 # connect engine to database
 engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
