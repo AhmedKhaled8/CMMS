@@ -1,0 +1,33 @@
+description shall include an itemized list of the procedures performed, including electrical safety. PM
+services shall include, but need not be limited to, the following:
+1) Cleaning of equipment.
+2) Reviewing operating system software diagnostics to ensure that the system is operating in
+accordance with Section 3, Conformance Standards or the manufacturer's specifications.
+3) Calibrating and lubricating the equipment.
+4) Performing remedial maintenance of non-emergent nature.
+5) Testing and replacing faulty and worn parts and/or parts likely to become faulty, fail or become
+worn.
+6) Inspecting and replacing where indicated, electrical wiring and cables for wear and fraying.
+7) Inspecting, and replacing where indicated, all mechanical components which may include, but is
+not limited to: X-ray tube mounting hardware, patient restraints and support devices, cables and
+mounting hardware, chains, belts, bearings and tracks, interlocks, clutches, motors, keyboards, and
+patient couches for mechanical integrity, safety, and performance.
+8) Returning the equipment to the operating condition defined in Section 3, Conformance
+Standards.
+9) Providing documentation of services performed.
+10) Inspecting and calibrating the hard copy image device.
+B. PM services shall be performed in accordance with, and during the hours defined in, the
+preventive maintenance schedule established herein. All exceptions to the PM schedule shall be
+arranged and approved in advance with the COR.
+C. Any charges for parts, services, manuals, tools, or software required to successfully complete
+scheduled PM are included within this contract, and its agreed upon price, unless specifically stated in
+writing otherwise.
+8. PARTS: - The Contractor shall furnish and replace parts to meet uptime requirements. The
+Contractor has ready access to all parts, including unique and/or high mortality replacement parts. All
+parts supplied shall be compatible with existing equipment. The contract shall include all parts [except -
+if applicable - those parts specifically listed as being EXCLUDED]. The contractor shall use new original
+equipment manufacturer (OEM) parts. All parts shall be of current manufacture and have complete
+versatility with the presently installed equipment. All parts shall perform identically to the original
+equipment specifications. Rebuilt parts, used parts or those removed from another [name the
+equipment], shall not be installed without specific approval by the CO or the COR. (The Contractor shall
+also list any excluded parts under the service contract)
