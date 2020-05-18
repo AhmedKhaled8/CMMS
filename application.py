@@ -34,7 +34,7 @@ from helpers import admin_required, apology, check_admin_cookies
 #check_admins()
 
 # connect engine to database
-engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
+engine = create_engine("mysql+pymysql://root:123456@localhost/CMMS",echo = None)
 # make a metadata object for DB handling
 meta = MetaData()
 # make a DB_cursor object for commiting
@@ -386,7 +386,7 @@ def login_man():
                 sel_command = db.execute(sel_command)
                 row = sel_command.fetchone()
                 if row is not None:
-                    due_serials.append(["Device with serial " + str(sel_command.fetchone()[1]) + " have a maintainance date " +str(row[2])])
+                    due_serials.append(["Device with serial " + str(row[1]) + " have a maintainance date " +str(row[2])])
                 
     
         # Redirect user to home page
