@@ -14,7 +14,7 @@
 		<tbody>
 			{% for val in row %}
 		<tr>
-			<td>{{val[0]}}</td>
+			<td>{{val[0].replace('_', ' ')}}</td>
 			<td>{{val[1]}}</td>
 		</tr>
 		{% endfor %}
