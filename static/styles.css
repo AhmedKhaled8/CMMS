@@ -116,11 +116,12 @@ main img
 {
     color: white;
     font-weight: bold;
-     width: 50%;
+     width: 70%;
      margin: 0 auto;
-     margin-bottom: 5px;
+     margin-bottom: 30px;
      font-size: 18px;
      text-transform: capitalize;
+     
 }
 
 input[type='checkbox']:after {
@@ -143,9 +144,10 @@ input[type='checkbox']:after {
     font-weight: 500;
 }
 
-td
+td, th
 {
     border: 1px solid black;
+    border-top: 1px solid black;
 }
 
 tr:nth-child(even) {background:#66dbff; color: black;}
@@ -154,4 +156,12 @@ tr:nth-child(odd) {background: #0099cc; color: black;}
 textarea
 {
     width: 25%;
+}
+
+
+
+.btn.btn-danger.pull-right
+{
+    margin: 15px;
+    font-size: 20px;
 }
