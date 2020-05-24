@@ -16,7 +16,6 @@
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Code</th>
           <th scope="col">Name</th>
           <th scope="col">Model</th>
           <th scope="col">Manufacturer</th>          
@@ -37,7 +36,7 @@
         {% for row in rows %}
         <tr>
         <th scope="row">{{loop.index}}</th>
-        {%for val in row %}
+        {%for val in row[1:] %}
         <td>{{val}}</td>
         {% endfor %}
         <tr>

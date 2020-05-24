@@ -7,22 +7,22 @@
 {% block main %}
     <form action="/remove_device" method="post">
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="code" placeholder="device code" type="text">
+            <input autocomplete="off" autofocus class="form-control" name="code" placeholder="device code" type="text" required>
         </div>
         
         <div class="form-group">
 			<label for="cause">Cause of scraping</label>
-            <select id="cause" name="cause">
+            <select id="cause" name="cause" required>
 				<option value="upgrading">Upgrading to a new device</option>
 				<option value="non-functional">The device in non-functional</option>
 			</select>
 		</div>
 				
         <div class="form-group">
-            <input class="form-control" id="password" name="password" placeholder="Admin Password" type="password">
+            <input class="form-control" id="password" name="password" placeholder="Admin Password" type="password" required>
         </div>
         <div class="form-group">
-            <input class="form-control" id="confirm" name="confirmation" placeholder="confirm password" type="password">
+            <input class="form-control" id="confirm" name="confirmation" placeholder="confirm password" type="password" required>
         </div>
         <button class="btn btn-primary" type="submit">Sumbit</button>
     </form>

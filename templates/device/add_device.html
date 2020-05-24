@@ -9,19 +9,19 @@
     <form action="/add_device" method="post" id="form">
         <div class="form-group">
 			<label for="name">Device name</label>
-            <input autocomplete="off" autofocus class="form-control" id="name" name="name" placeholder="name" type="text">
+            <input autocomplete="off" autofocus class="form-control" id="name" name="name" placeholder="name" type="text" required>
         </div>
         <div class="form-group">
 			<label for="model">Device model</label>
-            <input autocomplete="off" class="form-control" id="model" name="model" placeholder="Device model" type="text">
+            <input autocomplete="off" class="form-control" id="model" name="model" placeholder="Device model" type="text" required>
         </div>
         <div class="form-group">
 			<label for="manufacturer">Device manufacturer</label>
-            <input autocomplete="off" class="form-control" id="manufacturer" name="manufacturer" placeholder="Device manufacturer" type="text">
+            <input autocomplete="off" class="form-control" id="manufacturer" name="manufacturer" placeholder="Device manufacturer" type="text" required>
         </div>
         <div class="form-group">
 			<label for="serial">Device serial</label>
-			<input autocomplete="off" class="form-control" id="serial" name="serial" onkeypress="return isNumberKey(event)" placeholder="Device serial" type="text">
+			<input autocomplete="off" class="form-control" id="serial" name="serial" onkeypress="return isNumberKey(event)" placeholder="Device serial" type="text" required>
 			<script>
 					function isNumberKey(evt){
 						var charCode = (evt.which) ? evt.which : evt.keyCode
@@ -33,7 +33,7 @@
         </div>
         <div class="form-group">
 			<label for="country">Manufacturer country</label>
-            <select id="country" name="country">
+            <select id="country" name="country" required>
 				<option value="">Select country</option>
 				<option value="AFG">Afghanistan</option>
 				<option value="ALA">Aland Islands</option>
@@ -289,7 +289,7 @@
         
         <div class="form-group">
 			<label for="type">Device type</label>
-            <select id="type" name="type">
+            <select id="type" name="type" required>
 				{% for type in device_types %}
 				<option value = "{{ type }}">{{ type }}</option>
 				{% endfor %}
@@ -299,21 +299,21 @@
         
         <div class="form-group">
 			<label for="receive_date">Recieve date</label>
-            <input autocomplete="off" class="form-control" id="receive_date" name="receive_date" type="date">
+            <input autocomplete="off" class="form-control" id="receive_date" name="receive_date" type="date" required>
         </div>
         <div class="form-group">
 			<label for="maint_date">Maintainance date</label>
-            <input autocomplete="off" class="form-control" id="maint_date" name="maint_date" type="date">
+            <input autocomplete="off" class="form-control" id="maint_date" name="maint_date" type="date" required>
         </div>
         <div class="form-group">
 			<label for="cost">Device cost</label>
-            <input autocomplete="off" class="form-control" id="cost" onkeypress="return isNumberKey(event)" name="cost" placeholder="Device cost" type="number">
+            <input autocomplete="off" class="form-control" id="cost" onkeypress="return isNumberKey(event)" name="cost" placeholder="Device cost" type="number" required>
         </div>
          <div class="form-group">
 			<label for="textarea">Description</label>
 			<textarea class="form-control" id="textarea" name="description" rows="3" maxlength="250"></textarea>
 		</div>
-        <button class="btn btn-primary" type="submit">Sumbit</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 
     <script src="/static/passcheck.js"></script>
