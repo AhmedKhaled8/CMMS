@@ -34,7 +34,7 @@ from helpers import admin_required, apology, check_admin_cookies
 #check_admins()
 
 # connect engine to database
-engine = create_engine("mysql+pymysql://root:123456@localhost/CMMS",echo = None)
+engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)
 # make a metadata object for DB handling
 meta = MetaData()
 # make a DB_cursor object for commiting
