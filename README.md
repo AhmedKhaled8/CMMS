@@ -15,8 +15,11 @@
 * Make sure that you have installed the packages in ```dependents.txt```
 * Make sure that the sql server is running on your device.
 * In line 37 in ```application.py```, change the username and password of your sql server as the following:
+<br>
 ```engine = create_engine("mysql+pymysql://{username}:{password}@localhost/CMMS",echo = None)```
+<br>
 For example our username and password are ```root``` and ```sqldata```, so the line 37 would be like this:
+<br>
 ```engine = create_engine("mysql+pymysql://root:sqldata@localhost/CMMS",echo = None)```
 * Using ```flask```, set the ```FLASK_APP``` to ```application.py``` through terminal either on
   * Linux: ```export FLASK_APP=application.py```
