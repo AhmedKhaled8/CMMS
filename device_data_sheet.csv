@@ -1,0 +1,33 @@
+name,model,manufacturer,country,receive_date,cost,department,remove_date,serial,type,status,maint_date
+Yuwell Ventilator I,YH-830,Oxford Ventilators,GBR,20-05-20,320000,Open Cardiology,NULL,1000,Ventilator,operational,20-06-20
+Yuwell Ventilator II,YH-830,Oxford Ventilators,GBR,20-05-20,320000,Open Cardiology,NULL,1001,Ventilator,operational,20-06-20
+Yuwell Ventilator III,YH-830,Oxford Ventilators,GBR,20-05-20,320000,Open Cardiology,NULL,1002,Ventilator,operational,20-06-20
+HeartStart XL Defibrillator I,HeartStart XL,Philips ,GBR,20-05-20,60000,Open Cardiology,NULL,1100,Defibrillator,operational,20-06-20
+HeartStart XL Defibrillator II,HeartStart XL,Philips,GBR,20-05-20,60000,Open Cardiology,NULL,1101,Defibrillator,operational,20-06-20
+Infinity Delta Monitor I,Infinity Delta,Draeger,DEU,20-05-20,30000,Open Cardiology,NULL,1200,Monitor,operational,20-06-20
+Infinity Delta Monitor II,Infinity Delta,Draeger,DEU,20-05-20,30000,Open Cardiology,NULL,1201,Monitor,operational,20-06-20
+Infinity Delta Monitor III,Infinity Delta,Draeger,DEU,20-05-20,30000,Open Cardiology,NULL,1202,Monitor,operational,20-06-20
+Infinity Delta Monitor IV,Infinity Delta,Draeger,DEU,20-05-20,30000,Open Cardiology,NULL,1203,Monitor,operational,20-06-20
+Ultrasound Machine I,DW-370,Dawei Medical,CHN,20-05-20,400000,Open Cardiology,NULL,1300,Ultrasonic,operational,20-06-20
+Ultrasound Machine II,"DW-370	",Dawei Medical,CHN,20-05-20,400000,Open Cardiology,NULL,1301,Ultrasonic,operational,20-06-20
+Ultrasound Machine III,ACUSON,SIEMENS,DEU,20-05-20,1000000,Open Cardiology,NULL,1302,Ultrasonic,operational,20-06-20
+X-Ray Device I,ROTANODE,TOSHIBA,JPN,20-05-20,100000,Open Cardiology,NULL,1400,X-Ray,operational,20-06-20
+X-Ray Device I,ROTANODE,TOSHIBA,JPN,20-05-20,100000,Open Cardiology,NULL,1401,X-Ray,operational,20-06-20
+Ultrasound Machine IV,ACUSON,SIEMENS,DEU,20-05-20,1000000,Radiology,NULL,2000,Ultrasonic,operational,20-06-20
+Ultrasound Machine V,ACUSON,SIEMENS,DEU,20-05-20,1000000,Radiology,NULL,2001,Ultrasonic,operational,20-06-20
+Ultrasound Machine VI,ACUSON,SIEMENS,DEU,20-05-20,1000000,Radiology,NULL,2002,Ultrasonic,operational,20-06-20
+X-Ray Device II,ROTANODE,TOSHIBA,JPN,20-05-20,100000,Radiology,NULL,2100,X-Ray,operational,20-06-20
+X-Ray Device III,ROTANODE,TOSHIBA,JPN,20-05-20,100000,Radiology,NULL,2101,X-Ray,operational,20-06-20
+X-Ray Device IV,ROTANODE,TOSHIBA,JPN,20-05-20,100000,Radiology,NULL,2102,X-Ray,operational,20-06-20
+Brilliance CT Machine I,Brilliance 16-Akron,Philips ,GBR,20-05-20,1500000,Radiology,NULL,2200,CT,operational,20-06-20
+Brilliance CT Machine II,Brilliance 16-Akron,Philips,GBR,20-05-20,1500000,Radiology,NULL,2201,Ultrasonic,operational,20-06-20
+Espree MRI Machine I,Espree TiM,Siemens,DEU,20-05-20,3000000,Radiology,NULL,2300,MRI,operational,20-06-20
+Espree MRI Machine II,Espree TiM,Siemens,DEU,20-05-20,3000000,Radiology,NULL,2301,MRI,operational,20-06-20
+IPS-12 Syringe Pump I,IPS-12,Inovenso ,TUR,20-05-20,10000,Admissions,NULL,3000,Syringe Pump,operational,20-06-20
+IPS-12 Syringe Pump II,IPS-12,Inovenso ,TUR,20-05-20,10000,Admissions,NULL,3001,Syringe Pump,operational,20-06-20
+Infinity Delta Monitor V,Infinity Delta,"Draeger	",DEU,20-05-20,30000,Admissions,NULL,3100,Monitor,operational,20-06-20
+Infinity Delta Monitor VI,Infinity Delta,"Draeger	",DEU,20-05-20,30000,Admissions,NULL,3101,Monitor,operational,20-06-20
+HeartStart XL Defibrillator III,HeartStart XL,Philips,GBR,20-05-20,60000,Admissions,NULL,3200,Defibrillator,operational,20-06-20
+HeartStart XL Defibrillator IV,HeartStart XL,Philips,GBR,20-05-20,60000,Admissions,NULL,3201,Defibrillator,operational,20-06-20
+ECG MACHINE I,ELI 250C,BURDICK,USA,20-05-20,65000,Admissions,NULL,3300,ECG,operational,20-06-20
+ECG MACHINE II,ELI 250C,BURDICK ,USA,20-05-20,65000,Admissions,NULL,3301,ECG,operational,20-06-20
